@@ -1,7 +1,7 @@
-package com.mojh7.daliybudget.budget.domain;
+package com.mojh.daliybudget.budget.domain;
 
-import com.mojh7.daliybudget.common.entity.BaseTimeEntity;
-import com.mojh7.daliybudget.member.domain.Member;
+import com.mojh.daliybudget.common.entity.BaseTimeEntity;
+import com.mojh.daliybudget.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

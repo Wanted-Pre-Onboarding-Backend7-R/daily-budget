@@ -1,7 +1,7 @@
-package com.mojh7.daliybudget.common.web;
+package com.mojh.daliybudget.common.web;
 
-import com.mojh7.daliybudget.common.exception.DailyBudgetAppException;
-import com.mojh7.daliybudget.common.exception.ErrorCode;
+import com.mojh.daliybudget.common.exception.DailyBudgetAppException;
+import com.mojh.daliybudget.common.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter

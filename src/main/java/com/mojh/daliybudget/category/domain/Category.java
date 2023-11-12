@@ -1,4 +1,4 @@
-package com.mojh7.daliybudget.category.domain;
+package com.mojh.daliybudget.category.domain;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

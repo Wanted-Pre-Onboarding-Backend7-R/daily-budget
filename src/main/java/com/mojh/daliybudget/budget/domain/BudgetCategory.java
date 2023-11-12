@@ -1,6 +1,6 @@
-package com.mojh7.daliybudget.expenditure.domain;
+package com.mojh.daliybudget.budget.domain;
 
-import com.mojh7.daliybudget.category.domain.Category;
+import com.mojh.daliybudget.category.domain.Category;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -14,17 +14,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Expenditure {
+public class BudgetCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "budget_id", nullable = false)
+    private Budget budget;
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
@@ -33,23 +36,10 @@ public class Expenditure {
     @Column(nullable = false)
     private Long amount;
 
-    @Column(nullable = false, columnDefinition = "char", length = 40)
-    private String memo;
-
-    @Column(nullable = false)
-    private Boolean excludeFromTotal;
-
-    @Column(nullable = false)
-    private LocalDateTime expenditureAt;
-
     @Builder
-    public Expenditure(Category category, Long amount, String memo,
-                       Boolean excludeFromTotal, LocalDateTime expenditureAt) {
+    public BudgetCategory(Budget budget, Category category, Long amount) {
+        this.budget = budget;
         this.category = category;
         this.amount = amount;
-        this.memo = memo;
-        this.excludeFromTotal = excludeFromTotal;
-        this.expenditureAt = expenditureAt;
     }
-
 }

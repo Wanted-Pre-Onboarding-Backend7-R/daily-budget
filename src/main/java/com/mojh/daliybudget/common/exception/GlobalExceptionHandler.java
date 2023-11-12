@@ -1,8 +1,7 @@
-package com.mojh7.daliybudget.common.exception;
+package com.mojh.daliybudget.common.exception;
 
-import com.mojh7.daliybudget.common.web.ApiResponse;
+import com.mojh.daliybudget.common.web.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.mojh7.daliybudget.common.entity;
+package com.mojh.daliybudget.common.entity;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;

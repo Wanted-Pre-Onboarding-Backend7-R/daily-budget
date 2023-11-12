@@ -1,4 +1,4 @@
-package com.mojh7.daliybudget.common.exception;
+package com.mojh.daliybudget.common.exception;
 
 import lombok.AccessLevel;
 import lombok.Getter;

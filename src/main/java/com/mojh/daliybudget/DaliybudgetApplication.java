@@ -1,4 +1,4 @@
-package com.mojh7.daliybudget;
+package com.mojh.daliybudget;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
