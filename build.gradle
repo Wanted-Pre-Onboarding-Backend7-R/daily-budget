@@ -32,6 +32,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	// log4j2
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
+
 	// db
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	testImplementation 'com.h2database:h2'
@@ -48,4 +52,11 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+configurations {
+	all {
+		// log4j2와 Spring 기본 로깅 모듈 logBack과 충돌 방지를 위해 제외
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
 }
