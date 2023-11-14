@@ -21,12 +21,19 @@ repositories {
 	mavenCentral()
 }
 
+def JJWT_VERSION = "0.11.2"
+
 dependencies {
 	// spring, web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// jjwt
+	implementation("io.jsonwebtoken:jjwt-api:$JJWT_VERSION")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:$JJWT_VERSION")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$JJWT_VERSION")
 
 	// lombok
 	compileOnly 'org.projectlombok:lombok'
