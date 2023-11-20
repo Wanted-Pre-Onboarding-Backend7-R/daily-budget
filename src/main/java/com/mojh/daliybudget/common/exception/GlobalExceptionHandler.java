@@ -76,8 +76,7 @@ public class GlobalExceptionHandler {
     }
 
     private void logError(Exception ex) {
-        log.error(ex.getClass()
-                    .getSimpleName(), ex);
+        log.error(ex.getClass().getSimpleName(), ex);
     }
 
     private void logError(Exception ex, String detailMessage) {
