@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,8 +28,12 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, unique = true, length = 20)
     private String accountId;
 
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false, length = 60)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private Role role;
 
     @Column(nullable = false, length = 20)
     private String name;
@@ -39,12 +45,14 @@ public class Member extends BaseTimeEntity {
     private Boolean allowDailyExpenditureNotification;
 
     @Builder
-    public Member(String accountId, String password, String name,
+    public Member(String accountId, String password, Role role, String name,
                   Boolean allowDailyBudgetNotification, Boolean allowDailyExpenditureNotification) {
         this.accountId = accountId;
         this.password = password;
+        this.role = role;
         this.name = name;
         this.allowDailyBudgetNotification = allowDailyBudgetNotification;
         this.allowDailyExpenditureNotification = allowDailyExpenditureNotification;
     }
+
 }
