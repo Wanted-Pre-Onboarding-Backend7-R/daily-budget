@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.mojh.dailybudget.common.exception.ErrorCode.COM_BAD_REQUEST;
+import static com.mojh.dailybudget.common.exception.ErrorCode.COM_INVALID_PARAMETERS;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
@@ -38,11 +40,10 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult()
           .getAllErrors()
-          .forEach(error -> errors.put(((FieldError) error).getField(),
-                  error.getDefaultMessage()));
+          .forEach(error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
 
         logError(ex);
-        return ApiResponse.error(errors);
+        return ApiResponse.error(COM_INVALID_PARAMETERS, errors);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -65,14 +66,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageConversionException.class)
     public ApiResponse<?> handleHttpMessageConversionException(HttpMessageConversionException ex) {
         logError(ex);
-        return ApiResponse.error(ErrorCode.BAD_REQUEST);
+        return ApiResponse.error(COM_BAD_REQUEST);
     }
 
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ApiResponse<?> handleException(Exception ex) {
-        logError(ex, ErrorCode.INTERNAL_SERVER_ERROR.name());
-        return ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR);
+        logError(ex, ErrorCode.COM_INTERNAL_SERVER_ERROR.name());
+        return ApiResponse.error(ErrorCode.COM_INTERNAL_SERVER_ERROR);
     }
 
     private void logError(Exception ex) {
