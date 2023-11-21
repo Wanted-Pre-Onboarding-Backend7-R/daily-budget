@@ -19,12 +19,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
 public @interface ValidEnum {
 
-    String message() default "Invalid Enum";
+    String message() default "Invalid Enum Value";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
-    Class<? extends java.lang.Enum<?>> enumClass();
 
 }
