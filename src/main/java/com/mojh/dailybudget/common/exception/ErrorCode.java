@@ -32,9 +32,12 @@ public enum ErrorCode {
 
 
     // budget
-    TOTAL_BUDGET_LIMIT_EXCESS(BAD_REQUEST, "BUD0001", "총 예산은 1조원을 초과하여 설정할 수 없습니다.")
+    TOTAL_BUDGET_LIMIT_EXCESS(BAD_REQUEST, "BUD0001", "총 예산은 1조원을 초과하여 설정할 수 없습니다."),
 
     // expenditure
+
+    // category
+    CATEGORY_NOT_FOUND(NOT_FOUND, "C0001", "카테고리를 찾을 수 없습니다.")
 
     ;
 

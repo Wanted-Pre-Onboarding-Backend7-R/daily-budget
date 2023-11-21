@@ -29,7 +29,7 @@ public class BudgetController {
 
     @PutMapping("/budgets")
     public ResponseEntity<?> putBudget(@RequestBody @Valid final BudgetPutRequest request,
-                                                    @LoginMember Member member) {
+                                       @LoginMember Member member) {
         PutResultResponse putResultResponse = budgetService.putBudget(request, member);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
