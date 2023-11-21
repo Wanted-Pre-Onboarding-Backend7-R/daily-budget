@@ -1,6 +1,7 @@
 package com.mojh.dailybudget.budget.domain;
 
 import com.mojh.dailybudget.category.domain.Category;
+import com.mojh.dailybudget.category.domain.CategoryType;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -42,4 +43,22 @@ public class BudgetCategory {
         this.category = category;
         this.amount = amount;
     }
+
+    public CategoryType getCategoryType() {
+        return category.getType();
+    }
+
+    public void updateAmount(Long amount) {
+        // TODO: dto에서 amount validation 처리 하고 있지만 entity에도 추가 해야 될 수도, 추가하면 최대 금액 어디서 관리?
+        this.amount = amount;
+    }
+
+    public static BudgetCategory of(CategoryType categoryType, Long amount) {
+        Category category = new Category(categoryType);
+        return BudgetCategory.builder()
+                             .category(category)
+                             .amount(amount)
+                             .build();
+    }
+
 }

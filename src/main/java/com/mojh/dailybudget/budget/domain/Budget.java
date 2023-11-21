@@ -47,11 +47,13 @@ public class Budget extends BaseTimeEntity {
     private List<BudgetCategory> budgetCategoryList = new ArrayList<>();
 
     @Builder
-    public Budget(Member member, Integer year, Integer month, Long totalAmount) {
+    public Budget(Member member, Integer year, Integer month,
+                  Long totalAmount, List<BudgetCategory> budgetCategoryList) {
         this.member = member;
         this.year = year;
         this.month = month;
         this.totalAmount = totalAmount;
+        this.budgetCategoryList = budgetCategoryList;
     }
 
 }
