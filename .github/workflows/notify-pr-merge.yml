@@ -1,0 +1,27 @@
+name: Discord PR Merge Notification
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  pr-merge-notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord
+        if: github.event.pull_request.merged == true
+        run: |
+          JSON_DATA='{
+            "content": "🚀 ${{ github.event.pull_request.user.login }} 님이 ${{ github.event.pull_request.number }}번 PR을 Merge 했습니다.",
+            "embeds": [
+              {
+                "title": "${{ github.event.pull_request.title }}",
+                "description": "Branch : ${{ github.event.pull_request.head.ref }} -> ${{ github.event.pull_request.base.ref }}\nURL: ${{ github.event.pull_request.html_url }}",
+                "color": 8897791
+              }
+            ]
+          }'
+          curl -X POST \
+            -H 'Content-Type: application/json' \
+            -d "$JSON_DATA" \
+            ${{ secrets.DISCORD }}
