@@ -80,12 +80,10 @@ public abstract class AbstractJJwtProvider implements JwtProvider {
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token);
+        } catch (ExpiredJwtException ex) {
+            throw new DailyBudgetAppException(EXPIRED_TOKEN, ex);
         } catch (Exception ex) {
-            if (ex instanceof ExpiredJwtException) {
-                throw new DailyBudgetAppException(EXPIRED_TOKEN, ex);
-            } else {
-                throw new DailyBudgetAppException(INVALID_TOKEN, ex);
-            }
+            throw new DailyBudgetAppException(INVALID_TOKEN, ex);
         }
     }
 
@@ -130,12 +128,10 @@ public abstract class AbstractJJwtProvider implements JwtProvider {
                        .getBody()
                        .getExpiration()
                        .getTime() - Instant.now().toEpochMilli();
+        } catch (ExpiredJwtException ex) {
+            throw new DailyBudgetAppException(EXPIRED_TOKEN, ex);
         } catch (Exception ex) {
-            if (ex instanceof ExpiredJwtException) {
-                throw new DailyBudgetAppException(EXPIRED_TOKEN, ex);
-            } else {
-                throw new DailyBudgetAppException(INVALID_TOKEN, ex);
-            }
+            throw new DailyBudgetAppException(INVALID_TOKEN, ex);
         }
     }
 
