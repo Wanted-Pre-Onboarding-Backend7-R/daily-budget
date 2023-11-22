@@ -1,6 +1,6 @@
 package com.mojh.dailybudget.budget.domain;
 
-import com.mojh.dailybudget.common.entity.BaseTimeEntity;
+import com.mojh.dailybudget.common.domain.BaseTimeEntity;
 import com.mojh.dailybudget.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
