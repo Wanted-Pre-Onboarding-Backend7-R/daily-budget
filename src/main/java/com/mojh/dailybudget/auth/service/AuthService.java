@@ -1,17 +1,16 @@
 package com.mojh.dailybudget.auth.service;
 
+import com.mojh.dailybudget.auth.dto.LoginRequest;
+import com.mojh.dailybudget.auth.dto.TokensResponse;
 import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
 import com.mojh.dailybudget.member.domain.Member;
 import com.mojh.dailybudget.member.repository.MemberRepository;
-import com.mojh.dailybudget.auth.dto.LoginRequest;
-import com.mojh.dailybudget.auth.dto.TokensResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.mojh.dailybudget.common.exception.ErrorCode.INVALID_TOKEN;
 import static com.mojh.dailybudget.common.exception.ErrorCode.LOGIN_FAILED;
-import static com.mojh.dailybudget.auth.SecurityConstants.ACCOUNT_ID_CLAIM_NAME;
 
 @Service
 public class AuthService {
@@ -58,7 +57,7 @@ public class AuthService {
     public TokensResponse reissueTokens(String accessTokenHeader, String refreshToken) {
         String accessToken = jwtService.extractAccessTokenFrom(accessTokenHeader);
 
-        String accountId = jwtService.parseClaimRefreshToken(refreshToken, ACCOUNT_ID_CLAIM_NAME);
+        String accountId = jwtService.parseRefreshTokenSubject(refreshToken);
 
         jwtService.validateTokensAccount(accessToken, refreshToken);
         jwtService.validateRefreshToken(refreshToken);
@@ -71,12 +70,12 @@ public class AuthService {
 
         // 재발급
         String reissuedAccessToken = jwtService.generateAccessToken(accountId);
-        String reissuedRefreshToken = jwtService.generateRefreshToken(accountId);
+        String reissuedRefreshToken = jwtService.generateRefreshTokenInSameChain(accountId, refreshToken);
         jwtService.saveRefreshToken(reissuedRefreshToken);
 
         return TokensResponse.builder()
-                             .accessToken(accessToken)
-                             .refreshToken(refreshToken)
+                             .accessToken(reissuedAccessToken)
+                             .refreshToken(reissuedRefreshToken)
                              .build();
     }
     

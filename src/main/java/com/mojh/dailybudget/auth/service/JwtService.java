@@ -1,9 +1,9 @@
 package com.mojh.dailybudget.auth.service;
 
-import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
 import com.mojh.dailybudget.auth.domain.RefreshToken;
 import com.mojh.dailybudget.auth.jwt.JwtProvider;
 import com.mojh.dailybudget.auth.repository.RefreshTokenRepository;
+import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
 import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,12 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.mojh.dailybudget.auth.SecurityConstants.BEARER_PREFIX;
+import static com.mojh.dailybudget.auth.SecurityConstants.REFRESH_TOKEN_CHAIN_CLAIM_NAME;
 import static com.mojh.dailybudget.common.exception.ErrorCode.ALREADY_LOGGED_OUT;
 import static com.mojh.dailybudget.common.exception.ErrorCode.INVALID_TOKEN;
 import static com.mojh.dailybudget.common.exception.ErrorCode.MISMATCHED_TOKENS_ACCOUNT;
-import static com.mojh.dailybudget.auth.SecurityConstants.ACCOUNT_ID_CLAIM_NAME;
-import static com.mojh.dailybudget.auth.SecurityConstants.BEARER_PREFIX;
-import static com.mojh.dailybudget.auth.SecurityConstants.REFRESH_TOKEN_CHAIN_CLAIM_NAME;
 
 
 @Service
@@ -33,29 +32,32 @@ public class JwtService {
     }
 
     public String generateAccessToken(String accountId) {
-        Map<String, String> claims = Map.of(ACCOUNT_ID_CLAIM_NAME, accountId);
-        return accessTokenProvider.generateToken(claims);
+        return accessTokenProvider.generateToken(accountId);
     }
 
     public String generateRefreshToken(String accountId) {
         return generateRefreshToken(accountId, UUID.randomUUID().toString());
     }
 
-    public String generateRefreshToken(String accountId, String tokenChainId) {
+    public String generateRefreshTokenInSameChain(String accountId, String refreshToken) {
+        String tokenChainId = refreshTokenProvider.parseClaim(refreshToken, REFRESH_TOKEN_CHAIN_CLAIM_NAME);
+        return generateRefreshToken(accountId, tokenChainId);
+    }
+
+    private String generateRefreshToken(String accountId, String tokenChainId) {
         Map<String, String> claims = Map.of(
-                ACCOUNT_ID_CLAIM_NAME, accountId,
                 REFRESH_TOKEN_CHAIN_CLAIM_NAME, tokenChainId
         );
         String tokenId = UUID.randomUUID().toString();
-        return refreshTokenProvider.generateToken(claims, tokenId);
+        return refreshTokenProvider.generateTokenWithClaims(accountId, claims, tokenId);
     }
 
-    public <T> T parseClaimAccessToken(String accessToken, String claimName) {
-        return accessTokenProvider.parseClaim(accessToken, claimName);
+    public <T> T parseAccessTokenSubject(String accessToken) {
+        return accessTokenProvider.parseSubject(accessToken);
     }
 
-    public <T> T parseClaimRefreshToken(String refreshToken, String claimName) {
-        return refreshTokenProvider.parseClaim(refreshToken, claimName);
+    public <T> T parseRefreshTokenSubject(String refreshToken) {
+        return refreshTokenProvider.parseSubject(refreshToken);
     }
 
     public Map<String, String> parseClaimsRefreshToken(String refreshToken) {
@@ -78,8 +80,8 @@ public class JwtService {
      * @param refreshToken
      */
     public void validateTokensAccount(String accessToken, String refreshToken) {
-        String accessTokenAccountId = parseClaimAccessToken(accessToken, ACCOUNT_ID_CLAIM_NAME);
-        String refreshTokenAccountId = parseClaimRefreshToken(refreshToken, ACCOUNT_ID_CLAIM_NAME);
+        String accessTokenAccountId = parseAccessTokenSubject(accessToken);
+        String refreshTokenAccountId = parseRefreshTokenSubject(refreshToken);
 
         if(!accessTokenAccountId.equals(refreshTokenAccountId)) {
             throw new DailyBudgetAppException(MISMATCHED_TOKENS_ACCOUNT);
@@ -114,7 +116,7 @@ public class JwtService {
     public void saveRefreshToken(String refreshToken) {
         Map<String, String> claims = parseClaimsRefreshToken(refreshToken);
         String refreshTokenChainId = claims.get(REFRESH_TOKEN_CHAIN_CLAIM_NAME);
-        String accountId = claims.get(ACCOUNT_ID_CLAIM_NAME);
+        String accountId = claims.get(Claims.SUBJECT);
         String refreshTokenId = claims.get(Claims.ID);
         long ttl = getRemainingExpirationTimeRefreshToken(refreshToken);
 

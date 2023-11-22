@@ -2,6 +2,7 @@ package com.mojh.dailybudget.auth.jwt;
 
 
 import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
@@ -34,10 +35,23 @@ public abstract class AbstractJJwtProvider implements JwtProvider {
     }
 
     @Override
-    public String generateToken(Map<String, String> claims) {
+    public String generateToken(String subject) {
         Instant now = Instant.now();
         return Jwts.builder()
                    .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                   .setSubject(subject)
+                   .setIssuedAt(Date.from(now))
+                   .setExpiration(Date.from(now.plusMillis(expiration)))
+                   .signWith(secretKey, signatureAlgorithm)
+                   .compact();
+    }
+
+    @Override
+    public String generateTokenWithClaims(String subject, Map<String, String> claims) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                   .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                   .setSubject(subject)
                    .setClaims(claims)
                    .setIssuedAt(Date.from(now))
                    .setExpiration(Date.from(now.plusMillis(expiration)))
@@ -46,12 +60,13 @@ public abstract class AbstractJJwtProvider implements JwtProvider {
     }
 
     @Override
-    public String generateToken(Map<String, String> claims, String tokenId) {
+    public String generateTokenWithClaims(String subject, Map<String, String> claims, String tokenId) {
         Instant now = Instant.now();
         return Jwts.builder()
                    .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                   .setClaims(claims)
+                   .setSubject(subject)
                    .setId(tokenId)
+                   .setClaims(claims)
                    .setIssuedAt(Date.from(now))
                    .setExpiration(Date.from(now.plusMillis(expiration)))
                    .signWith(secretKey, signatureAlgorithm)
@@ -65,12 +80,10 @@ public abstract class AbstractJJwtProvider implements JwtProvider {
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token);
+        } catch (ExpiredJwtException ex) {
+            throw new DailyBudgetAppException(EXPIRED_TOKEN, ex);
         } catch (Exception ex) {
-            if (ex instanceof ExpiredJwtException) {
-                throw new DailyBudgetAppException(EXPIRED_TOKEN, ex);
-            } else {
-                throw new DailyBudgetAppException(INVALID_TOKEN, ex);
-            }
+            throw new DailyBudgetAppException(INVALID_TOKEN, ex);
         }
     }
 
@@ -78,6 +91,12 @@ public abstract class AbstractJJwtProvider implements JwtProvider {
     public <T> T parseClaim(String token, String claimName) {
         Map<String, String> claims = parseClaims(token);
         return (T) claims.get(claimName);
+    }
+
+    @Override
+    public <T> T parseSubject(String token) {
+        Map<String, String> claims = parseClaims(token);
+        return (T) claims.get(Claims.SUBJECT);
     }
 
     @Override
@@ -109,12 +128,10 @@ public abstract class AbstractJJwtProvider implements JwtProvider {
                        .getBody()
                        .getExpiration()
                        .getTime() - Instant.now().toEpochMilli();
+        } catch (ExpiredJwtException ex) {
+            throw new DailyBudgetAppException(EXPIRED_TOKEN, ex);
         } catch (Exception ex) {
-            if (ex instanceof ExpiredJwtException) {
-                throw new DailyBudgetAppException(EXPIRED_TOKEN, ex);
-            } else {
-                throw new DailyBudgetAppException(INVALID_TOKEN, ex);
-            }
+            throw new DailyBudgetAppException(INVALID_TOKEN, ex);
         }
     }
 

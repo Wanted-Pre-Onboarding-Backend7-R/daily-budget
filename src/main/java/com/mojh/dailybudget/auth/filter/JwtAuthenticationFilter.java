@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.mojh.dailybudget.auth.SecurityConstants.ACCOUNT_ID_CLAIM_NAME;
 import static com.mojh.dailybudget.auth.SecurityConstants.AUTH_EXCEPTION_INFO;
 
 @Component
@@ -36,13 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String accessToken = jwtService.extractAccessTokenFrom(request.getHeader(HttpHeaders.AUTHORIZATION));
             jwtService.validateAccessToken(accessToken);
-            String accountId = jwtService.parseClaimAccessToken(accessToken, ACCOUNT_ID_CLAIM_NAME);
+            String accountId = jwtService.parseAccessTokenSubject(accessToken);
 
             UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(accountId);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (DailyBudgetAppException ex) {
             request.setAttribute(AUTH_EXCEPTION_INFO, ex);
