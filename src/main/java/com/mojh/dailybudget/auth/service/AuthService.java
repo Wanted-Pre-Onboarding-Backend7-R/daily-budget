@@ -75,8 +75,8 @@ public class AuthService {
         jwtService.saveRefreshToken(reissuedRefreshToken);
 
         return TokensResponse.builder()
-                             .accessToken(accessToken)
-                             .refreshToken(refreshToken)
+                             .accessToken(reissuedAccessToken)
+                             .refreshToken(reissuedRefreshToken)
                              .build();
     }
     
