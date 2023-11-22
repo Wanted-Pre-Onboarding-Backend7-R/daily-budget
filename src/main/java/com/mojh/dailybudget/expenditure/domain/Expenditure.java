@@ -1,6 +1,7 @@
 package com.mojh.dailybudget.expenditure.domain;
 
 import com.mojh.dailybudget.category.domain.Category;
+import com.mojh.dailybudget.common.domain.BaseTimeEntity;
 import com.mojh.dailybudget.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,7 +23,7 @@ import java.time.LocalDateTime;
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Expenditure {
+public class Expenditure extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
