@@ -5,6 +5,7 @@ import com.mojh.dailybudget.category.domain.CategoryType;
 import com.mojh.dailybudget.common.vaildation.ValidEnum;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
@@ -31,6 +32,7 @@ public class ExpenditureUpdateRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime expenditureAt;
 
+    @Builder
     public ExpenditureUpdateRequest(CategoryType category, Long amount, String memo,
                                     Boolean excludeFromTotal, LocalDateTime expenditureAt) {
         this.category = category;
