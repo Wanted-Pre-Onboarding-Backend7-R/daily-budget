@@ -4,20 +4,19 @@ import com.mojh.dailybudget.category.domain.Category;
 import com.mojh.dailybudget.category.domain.CategoryType;
 import com.mojh.dailybudget.common.vaildation.ValidEnum;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
-import com.mojh.dailybudget.member.domain.Member;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ExpenditureCreateRequest {
+public class ExpenditureUpdateRequest {
 
     @ValidEnum
     private CategoryType category;
@@ -26,15 +25,15 @@ public class ExpenditureCreateRequest {
     private Long amount;
 
     @Size(max = 40)
-    private String memo = "";
+    private String memo;
 
-    private Boolean excludeFromTotal = false;
+    private Boolean excludeFromTotal;
 
-    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime expenditureAt;
 
-    public ExpenditureCreateRequest(CategoryType category, Long amount, String memo,
+    @Builder
+    public ExpenditureUpdateRequest(CategoryType category, Long amount, String memo,
                                     Boolean excludeFromTotal, LocalDateTime expenditureAt) {
         this.category = category;
         this.amount = amount;
@@ -43,9 +42,8 @@ public class ExpenditureCreateRequest {
         this.expenditureAt = expenditureAt;
     }
 
-    public Expenditure toEntity(Member member, Category category) {
+    public Expenditure toEntity(Category category) {
         return Expenditure.builder()
-                          .member(member)
                           .category(category)
                           .amount(amount)
                           .memo(memo)

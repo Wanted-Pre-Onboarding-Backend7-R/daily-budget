@@ -1,6 +1,9 @@
 package com.mojh.dailybudget.expenditure.domain;
 
 import com.mojh.dailybudget.category.domain.Category;
+import com.mojh.dailybudget.common.domain.BaseTimeEntity;
+import com.mojh.dailybudget.common.domain.Patchable;
+import com.mojh.dailybudget.common.domain.PatchableFieldUtil;
 import com.mojh.dailybudget.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,7 +25,7 @@ import java.time.LocalDateTime;
 @Getter
 @EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Expenditure {
+public class Expenditure extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,19 +35,24 @@ public class Expenditure {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
+    @Patchable
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Patchable
     @Column(nullable = false)
     private Long amount;
 
+    @Patchable
     @Column(nullable = false, columnDefinition = "char", length = 40)
     private String memo;
 
+    @Patchable
     @Column(nullable = false)
     private Boolean excludeFromTotal;
 
+    @Patchable
     @Column(nullable = false)
     private LocalDateTime expenditureAt;
 
@@ -57,6 +65,14 @@ public class Expenditure {
         this.memo = memo;
         this.excludeFromTotal = excludeFromTotal;
         this.expenditureAt = expenditureAt;
+    }
+
+    public boolean isOwner(Member member) {
+        return this.member.equals(member);
+    }
+
+    public boolean update(Object requestObj) {
+        return PatchableFieldUtil.patch(this, requestObj);
     }
 
 }

@@ -22,6 +22,10 @@ spring:
         format_sql: true
         use_sql_comments: true
 
+logging:
+  level:
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
 jwt:
   access:
     secret-key: 'jwttokenlocaltestsecretkey1q2w3e4r!Useasecretkeyofatleast64bytesAT'
