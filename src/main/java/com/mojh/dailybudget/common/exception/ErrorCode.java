@@ -2,7 +2,6 @@ package com.mojh.dailybudget.common.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -36,9 +35,11 @@ public enum ErrorCode {
     TOTAL_BUDGET_LIMIT_EXCESS(BAD_REQUEST, "BUD0001", "총 예산은 1조원을 초과하여 설정할 수 없습니다."),
 
     // expenditure
+    EXPENDITURE_NOT_FOUND(NOT_FOUND, "EXP0001", "지출 정보를 찾을 수 없습니다."),
+    EXPENDITURE_MEMBER_MISMATCH(BAD_REQUEST, "EXP0002", "해당 지출 정보를 작성한 유저와 다릅니다."),
 
     // category
-    CATEGORY_NOT_FOUND(NOT_FOUND, "C0001", "카테고리를 찾을 수 없습니다.")
+    CATEGORY_NOT_FOUND(NOT_FOUND, "CATE0001", "카테고리를 찾을 수 없습니다.")
 
     ;
 
