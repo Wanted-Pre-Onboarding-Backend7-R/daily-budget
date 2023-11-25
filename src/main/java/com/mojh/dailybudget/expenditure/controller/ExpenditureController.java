@@ -8,6 +8,7 @@ import com.mojh.dailybudget.expenditure.service.ExpenditureService;
 import com.mojh.dailybudget.member.domain.Member;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,5 +52,11 @@ public class ExpenditureController {
         return ApiResponse.succeed(updated);
     }
 
+    @DeleteMapping("/{expenditureId}")
+    public ResponseEntity deleteExpenditure(@LoginMember final Member member,
+                                            @PathVariable Long expenditureId) {
+        expenditureService.deleteExpenditure(member, expenditureId);
+        return ResponseEntity.noContent().build();
+    }
 
 }

@@ -46,4 +46,16 @@ public class ExpenditureService {
         return expenditure.update(request.toEntity(category));
     }
 
+    @Transactional
+    public void deleteExpenditure(Member member, Long expenditureId) {
+        Expenditure expenditure = expenditureRepository.findById(expenditureId)
+                                                       .orElseThrow(() -> new DailyBudgetAppException(EXPENDITURE_NOT_FOUND));
+
+        if(!expenditure.isOwner(member)) {
+            throw new DailyBudgetAppException(EXPENDITURE_MEMBER_MISMATCH);
+        }
+
+        expenditureRepository.delete(expenditure);
+    }
+
 }
