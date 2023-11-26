@@ -30,13 +30,12 @@ public enum ErrorCode {
     ALREADY_LOGGED_OUT(UNAUTHORIZED, "AUTH0004", "이미 로그아웃 처리된 유저입니다."),
     LOGIN_FAILED(BAD_REQUEST, "AUTH0005", "아이디 혹은 비밀번호가 일치하지 않습니다."),
 
-
     // budget
     TOTAL_BUDGET_LIMIT_EXCESS(BAD_REQUEST, "BUD0001", "총 예산은 1조원을 초과하여 설정할 수 없습니다."),
 
     // expenditure
     EXPENDITURE_NOT_FOUND(NOT_FOUND, "EXP0001", "지출 정보를 찾을 수 없습니다."),
-    EXPENDITURE_MEMBER_MISMATCH(BAD_REQUEST, "EXP0002", "해당 지출 정보를 작성한 유저와 다릅니다."),
+    EXPENDITURE_MEMBER_MISMATCH(BAD_REQUEST, "EXP0002", "해당 지출 정보를 작성한 유저가 아닙니다."),
 
     // category
     CATEGORY_NOT_FOUND(NOT_FOUND, "CATE0001", "카테고리를 찾을 수 없습니다.")

@@ -45,7 +45,7 @@ public class Expenditure extends BaseTimeEntity {
     private Long amount;
 
     @Patchable
-    @Column(nullable = false, columnDefinition = "char", length = 40)
+    @Column(nullable = false, columnDefinition = "char(40)")
     private String memo;
 
     @Patchable

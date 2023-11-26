@@ -4,7 +4,6 @@ import com.mojh.dailybudget.budget.domain.Budget;
 import com.mojh.dailybudget.budget.domain.BudgetCategory;
 import com.mojh.dailybudget.budget.dto.BudgetPutRequest;
 import com.mojh.dailybudget.budget.dto.BudgetPutRequest.BudgetCategoryRequest;
-import com.mojh.dailybudget.budget.repository.BudgetCategoryRepository;
 import com.mojh.dailybudget.budget.repository.BudgetRepository;
 import com.mojh.dailybudget.category.domain.CategoryType;
 import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
@@ -43,7 +42,7 @@ public class BudgetService {
         }
 
         Optional<Budget> optionalBudget =
-                budgetRepository.findByMemberAndYearAndMonth(member, request.getYear(), request.getMonth());
+                budgetRepository.findByMemberAndBudgetYearAndBudgetMonth(member, request.getYear(), request.getMonth());
 
         // replace
         if (optionalBudget.isPresent()) {
@@ -70,8 +69,8 @@ public class BudgetService {
 
         Budget budget = Budget.builder()
                               .member(member)
-                              .year(request.getYear())
-                              .month(request.getMonth())
+                              .budgetYear(request.getYear())
+                              .budgetMonth(request.getMonth())
                               .totalAmount(totalAmount)
                               .budgetCategoryList(budgetCategoryList)
                               .build();
