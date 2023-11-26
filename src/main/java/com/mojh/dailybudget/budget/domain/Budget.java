@@ -35,10 +35,10 @@ public class Budget extends BaseTimeEntity {
     private Member member;
 
     @Column(nullable = false)
-    private Integer year;
+    private Integer budgetYear;
 
     @Column(nullable = false)
-    private Integer month;
+    private Integer budgetMonth;
 
     @Column(nullable = false)
     private Long totalAmount;
@@ -47,11 +47,11 @@ public class Budget extends BaseTimeEntity {
     private List<BudgetCategory> budgetCategoryList = new ArrayList<>();
 
     @Builder
-    public Budget(Member member, Integer year, Integer month,
+    public Budget(Member member, Integer budgetYear, Integer budgetMonth,
                   Long totalAmount, List<BudgetCategory> budgetCategoryList) {
         this.member = member;
-        this.year = year;
-        this.month = month;
+        this.budgetYear = budgetYear;
+        this.budgetMonth = budgetMonth;
         this.totalAmount = totalAmount;
         this.budgetCategoryList = budgetCategoryList;
     }
