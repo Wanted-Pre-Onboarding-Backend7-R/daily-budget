@@ -6,6 +6,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.ModelAttributeMethodProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +38,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(BindException.class)
-    public ApiResponse<?> handleBindException(BindException ex) {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ApiResponse<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult()
           .getAllErrors()
@@ -45,6 +47,21 @@ public class GlobalExceptionHandler {
 
         logError(ex);
         return ApiResponse.error(COM_INVALID_PARAMETERS, errors);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BindException.class)
+    public ApiResponse<?> handleBindException(BindException ex) {
+        logError(ex);
+        return ApiResponse.error(COM_INVALID_PARAMETERS);
+    }
+
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(HttpMessageConversionException.class)
+    public ApiResponse<?> handleHttpMessageConversionException(HttpMessageConversionException ex) {
+        logError(ex);
+        return ApiResponse.error(COM_BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -61,13 +78,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(METHOD_NOT_ALLOWED)
                              .allow(supportedMethods.toArray(HttpMethod[]::new))
                              .body(ApiResponse.error(ex.getMessage()));
-    }
-
-    @ResponseStatus(BAD_REQUEST)
-    @ExceptionHandler(HttpMessageConversionException.class)
-    public ApiResponse<?> handleHttpMessageConversionException(HttpMessageConversionException ex) {
-        logError(ex);
-        return ApiResponse.error(COM_BAD_REQUEST);
     }
 
     @ResponseStatus(INTERNAL_SERVER_ERROR)
