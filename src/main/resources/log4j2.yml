@@ -38,7 +38,7 @@ Configuration:
         - ref: File-Appender
         - ref: RollingFile-Appender
     Logger:
-      - name: com.mojh7
+      - name: com.mojh
         additivity: false
         level: debug
         AppenderRef:
