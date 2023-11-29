@@ -6,7 +6,7 @@ import com.mojh.dailybudget.category.service.CategorySerivce;
 import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
 import com.mojh.dailybudget.common.exception.ErrorCode;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
-import com.mojh.dailybudget.expenditure.dto.ExpenditureUpdateRequest;
+import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
 import com.mojh.dailybudget.expenditure.repository.ExpenditureRepository;
 import com.mojh.dailybudget.member.domain.Member;
 import com.mojh.dailybudget.member.fixture.MemberFixture;

@@ -1,4 +1,4 @@
-package com.mojh.dailybudget.expenditure.dto;
+package com.mojh.dailybudget.expenditure.dto.request;
 
 import com.mojh.dailybudget.category.domain.Category;
 import com.mojh.dailybudget.category.domain.CategoryType;
