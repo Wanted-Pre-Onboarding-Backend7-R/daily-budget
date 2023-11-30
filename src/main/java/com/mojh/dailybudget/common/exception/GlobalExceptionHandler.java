@@ -65,11 +65,31 @@ public class GlobalExceptionHandler {
         
         return ApiResponse.error(COM_INVALID_PARAMETERS, errors);
     }
-
-
+    
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(HttpMessageConversionException.class)
     public ApiResponse<?> handleHttpMessageConversionException(HttpMessageConversionException ex) {
+        logError(ex);
+        return ApiResponse.error(COM_BAD_REQUEST);
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ApiResponse<?> handleIllegalArgumentException(IllegalArgumentException ex) {
+        logError(ex);
+        return ApiResponse.error(COM_BAD_REQUEST);
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(IllegalStateException.class)
+    public ApiResponse<?> handleIllegalStateException(IllegalStateException ex) {
+        logError(ex);
+        return ApiResponse.error(COM_BAD_REQUEST);
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(IllegalAccessException.class)
+    public ApiResponse<?> handleIllegalAccessException(IllegalAccessException ex) {
         logError(ex);
         return ApiResponse.error(COM_BAD_REQUEST);
     }
