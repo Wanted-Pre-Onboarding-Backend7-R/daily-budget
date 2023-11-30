@@ -2,8 +2,6 @@ package com.mojh.dailybudget.expenditure.dto.request;
 
 import com.mojh.dailybudget.common.dto.request.AmountRangeRequest;
 import com.mojh.dailybudget.common.dto.request.PeriodRequest;
-import com.mojh.dailybudget.common.vaildation.annotation.ValidAmountRangeRequest;
-import com.mojh.dailybudget.common.vaildation.annotation.ValidPeriodRequest;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -14,11 +12,9 @@ import java.time.LocalDateTime;
 public class ExpenditureListRetrieveRequest {
 
     @Valid
-    @ValidPeriodRequest
     private PeriodRequest period;
 
     @Valid
-    @ValidAmountRangeRequest
     private AmountRangeRequest amountRangeRequest;
 
     private String category;
@@ -30,11 +26,28 @@ public class ExpenditureListRetrieveRequest {
                                    .beginDate(beginDate)
                                    .endDate(endDate)
                                    .build();
+
         this.amountRangeRequest = AmountRangeRequest.builder()
                                                     .minAmount(minAmount)
                                                     .maxAmount(maxAmount)
                                                     .build();
         this.category = category;
+    }
+
+    public LocalDateTime getBeginDate() {
+        return period.getBeginDate();
+    }
+
+    public LocalDateTime getEndDate() {
+        return period.getEndDate();
+    }
+
+    public Long getMinAmount() {
+        return amountRangeRequest.getMinAmount();
+    }
+
+    public Long getMaxAmount() {
+        return amountRangeRequest.getMaxAmount();
     }
 
 }

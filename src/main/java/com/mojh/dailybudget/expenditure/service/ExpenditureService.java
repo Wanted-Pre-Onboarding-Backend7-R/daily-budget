@@ -46,8 +46,8 @@ public class ExpenditureService {
     @Transactional(readOnly = true)
     public ExpenditureListResponse retrieveExpenditureList(ExpenditureListRetrieveRequest request, Member member) {
         List<Expenditure> expenditureList = expenditureRepository.retrieveExpenditureList(
-                member, request.getCategory(), request.getPeriod().getBeginDate(), request.getPeriod().getEndDate(),
-                request.getAmountRangeRequest().getMinAmount(), request.getAmountRangeRequest().getMaxAmount());
+                member, request.getCategory(), request.getBeginDate(), request.getEndDate(),
+                request.getMinAmount(), request.getMaxAmount());
 
         List<ExpenditureSummaryResponse> expenditureSummaryList = expenditureList.stream()
                                                                                  .map(ExpenditureSummaryResponse::of)

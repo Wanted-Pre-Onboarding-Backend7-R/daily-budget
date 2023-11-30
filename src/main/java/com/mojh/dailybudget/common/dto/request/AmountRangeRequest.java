@@ -1,5 +1,6 @@
 package com.mojh.dailybudget.common.dto.request;
 
+import com.mojh.dailybudget.common.vaildation.annotation.ValidAmountRangeRequest;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import org.hibernate.validator.constraints.Range;
 
 @Getter
 @NoArgsConstructor
+@ValidAmountRangeRequest
 public class AmountRangeRequest {
 
     @Range(min = 0L, max = 1000000000000L)
