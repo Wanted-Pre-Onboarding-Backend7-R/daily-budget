@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 public final class CategoryFixture {
 
     public static Map<CategoryType, Category> CATEGORY = Arrays.stream(CategoryType.values())
-                                                               .collect(Collectors.toMap(Function.identity(),
-                                                                       type -> new Category(type)));
+                                                               .collect(Collectors.toMap(Function.identity(), Category::new));
 
 }
