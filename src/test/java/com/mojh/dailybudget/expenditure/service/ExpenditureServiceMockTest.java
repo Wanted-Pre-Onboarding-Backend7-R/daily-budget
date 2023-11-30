@@ -11,10 +11,9 @@ import com.mojh.dailybudget.expenditure.domain.Expenditure;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureListRetrieveRequest;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureListResponse;
-import com.mojh.dailybudget.expenditure.dto.response.ExpenditureSummaryResponse;
 import com.mojh.dailybudget.expenditure.repository.ExpenditureRepository;
-import com.mojh.dailybudget.member.domain.Member;
 import com.mojh.dailybudget.member.MemberFixture;
+import com.mojh.dailybudget.member.domain.Member;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -26,13 +25,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.mojh.dailybudget.category.domain.CategoryType.EDUCATION;
@@ -224,14 +221,14 @@ class ExpenditureServiceMockTest {
                 request.getEndDate(), request.getMinAmount(), request.getMaxAmount())).willReturn(expenditureList);
 
         // when
-        ExpenditureListResponse result = expenditureService.retrieveExpenditureList(request, member);
+        ExpenditureListResponse actual = expenditureService.retrieveExpenditureList(request, member);
 
         // then
         assertAll(
-                () -> assertThat(result.getTotalAmount()).isEqualTo(totalAmount),
-                () -> result.getTotalExpenditureByCategory().entrySet().stream()
+                () -> assertThat(actual.getTotalAmount()).isEqualTo(totalAmount),
+                () -> actual.getTotalExpenditureByCategory().entrySet().stream()
                             .forEach(entry -> assertThat(entry.getValue()).isEqualTo(expenditureByCategory.get(entry.getKey()))),
-                () -> assertThat(result.getExpenditureList()).isEmpty()
+                () -> assertThat(actual.getExpenditureList()).isEmpty()
         );
     }
 
@@ -258,15 +255,15 @@ class ExpenditureServiceMockTest {
                 request.getEndDate(), request.getMinAmount(), request.getMaxAmount())).willReturn(expenditureList);
 
         // when
-        ExpenditureListResponse result = expenditureService.retrieveExpenditureList(request, member);
+        ExpenditureListResponse actual = expenditureService.retrieveExpenditureList(request, member);
 
         // then
         assertAll(
-                () -> assertThat(result.getTotalAmount()).isEqualTo(totalAmount),
-                () -> result.getTotalExpenditureByCategory().entrySet().stream()
+                () -> assertThat(actual.getTotalAmount()).isEqualTo(totalAmount),
+                () -> actual.getTotalExpenditureByCategory().entrySet().stream()
                             .forEach(entry -> assertThat(entry.getValue()).isEqualTo(expenditureByCategory.get(entry.getKey()))),
-                () -> assertThat(result.getExpenditureList().size()).isEqualTo(7),
-                () -> assertThat(result.getExpenditureList())
+                () -> assertThat(actual.getExpenditureList().size()).isEqualTo(7),
+                () -> assertThat(actual.getExpenditureList())
                         .extracting(e -> e.getCategory(), e -> e.getAmount(), e -> e.getExpenditureAt())
                         .containsExactlyElementsOf(expected)
         );
@@ -296,15 +293,15 @@ class ExpenditureServiceMockTest {
                 request.getEndDate(), request.getMinAmount(), request.getMaxAmount())).willReturn(expenditureList);
 
         // when
-        ExpenditureListResponse result = expenditureService.retrieveExpenditureList(request, member);
+        ExpenditureListResponse actual = expenditureService.retrieveExpenditureList(request, member);
 
         // then:
         assertAll(
-                () -> assertThat(result.getTotalAmount()).isEqualTo(totalAmount),
-                () -> result.getTotalExpenditureByCategory().entrySet().stream()
+                () -> assertThat(actual.getTotalAmount()).isEqualTo(totalAmount),
+                () -> actual.getTotalExpenditureByCategory().entrySet().stream()
                             .forEach(entry -> assertThat(entry.getValue()).isEqualTo(expenditureByCategory.get(entry.getKey()))),
-                () -> assertThat(result.getExpenditureList().size()).isEqualTo(4),
-                () -> assertThat(result.getExpenditureList())
+                () -> assertThat(actual.getExpenditureList().size()).isEqualTo(4),
+                () -> assertThat(actual.getExpenditureList())
                         .extracting(e -> e.getCategory(), e -> e.getAmount(), e -> e.getExpenditureAt())
                         .containsExactlyElementsOf(expected)
         );
@@ -333,16 +330,16 @@ class ExpenditureServiceMockTest {
                 request.getEndDate(), request.getMinAmount(), request.getMaxAmount())).willReturn(expenditureList);
 
         // when
-        ExpenditureListResponse result = expenditureService.retrieveExpenditureList(request, member);
+        ExpenditureListResponse actual = expenditureService.retrieveExpenditureList(request, member);
 
         // then
         assertAll(
-                () -> assertThat(result.getTotalAmount()).isEqualTo(totalAmount),
-                () -> result.getTotalExpenditureByCategory().entrySet().stream()
+                () -> assertThat(actual.getTotalAmount()).isEqualTo(totalAmount),
+                () -> actual.getTotalExpenditureByCategory().entrySet().stream()
                             .forEach(entry -> assertThat(entry.getValue()).isEqualTo(expenditureByCategory.get(entry.getKey()))),
-                () -> assertThat(result.getExpenditureList().size()).isEqualTo(4),
+                () -> assertThat(actual.getExpenditureList().size()).isEqualTo(4),
 
-                () -> assertThat(result.getExpenditureList())
+                () -> assertThat(actual.getExpenditureList())
                         .extracting(e -> e.getCategory(), e -> e.getAmount(), e -> e.getExpenditureAt())
                         .containsExactlyElementsOf(expected)
         );
@@ -371,16 +368,16 @@ class ExpenditureServiceMockTest {
                 request.getEndDate(), request.getMinAmount(), request.getMaxAmount())).willReturn(expenditureList);
 
         // when
-        ExpenditureListResponse result = expenditureService.retrieveExpenditureList(request, member);
+        ExpenditureListResponse actual = expenditureService.retrieveExpenditureList(request, member);
 
         // then
         assertAll(
-                () -> assertThat(result.getTotalAmount()).isEqualTo(totalAmount),
-                () -> result.getTotalExpenditureByCategory().entrySet().stream()
+                () -> assertThat(actual.getTotalAmount()).isEqualTo(totalAmount),
+                () -> actual.getTotalExpenditureByCategory().entrySet().stream()
                             .forEach(entry -> assertThat(entry.getValue()).isEqualTo(expenditureByCategory.get(entry.getKey()))),
-                () -> assertThat(result.getExpenditureList().size()).isEqualTo(5),
+                () -> assertThat(actual.getExpenditureList().size()).isEqualTo(5),
 
-                () -> assertThat(result.getExpenditureList())
+                () -> assertThat(actual.getExpenditureList())
                         .extracting(e -> e.getCategory(), e -> e.getAmount(), e -> e.getExpenditureAt())
                         .containsExactlyElementsOf(expected)
         );
@@ -409,15 +406,15 @@ class ExpenditureServiceMockTest {
                 request.getEndDate(), request.getMinAmount(), request.getMaxAmount())).willReturn(expenditureList);
 
         // when
-        ExpenditureListResponse result = expenditureService.retrieveExpenditureList(request, member);
+        ExpenditureListResponse actual = expenditureService.retrieveExpenditureList(request, member);
 
         // then
         assertAll(
-                () -> assertThat(result.getTotalAmount()).isEqualTo(totalAmount),
-                () -> result.getTotalExpenditureByCategory().entrySet().stream()
+                () -> assertThat(actual.getTotalAmount()).isEqualTo(totalAmount),
+                () -> actual.getTotalExpenditureByCategory().entrySet().stream()
                             .forEach(entry -> assertThat(entry.getValue()).isEqualTo(expenditureByCategory.get(entry.getKey()))),
-                () -> assertThat(result.getExpenditureList().size()).isEqualTo(8),
-                () -> assertThat(result.getExpenditureList())
+                () -> assertThat(actual.getExpenditureList().size()).isEqualTo(8),
+                () -> assertThat(actual.getExpenditureList())
                         .extracting(e -> e.getCategory(), e -> e.getAmount(), e -> e.getExpenditureAt())
                         .containsExactlyElementsOf(expected)
         );
@@ -439,12 +436,12 @@ class ExpenditureServiceMockTest {
         given(expenditureRepository.findById(expenditureId)).willReturn(Optional.of(expenditure));
 
         // when
-        boolean result = expenditureService.updateExpenditure(requet, member1, expenditureId);
+        boolean actual = expenditureService.updateExpenditure(requet, member1, expenditureId);
 
         // then: category는 기존의 값과 같았고, 지출 일시와 합계 제외는 수정 요청을 하지 않아서 변경되지 않는다.
         // 수정 요청한 금액과 메모만 변경됨.
         assertAll(
-                () -> assertThat(result).isTrue(),
+                () -> assertThat(actual).isTrue(),
                 () -> assertThat(expenditure.getCategory()).isEqualTo(captured.getCategory()),
                 () -> assertThat(expenditure.getAmount()).isEqualTo(requet.getAmount()),
                 () -> assertThat(expenditure.getMemo()).isEqualTo(requet.getMemo()),
@@ -469,11 +466,11 @@ class ExpenditureServiceMockTest {
         given(expenditureRepository.findById(expenditureId)).willReturn(Optional.of(expenditure));
 
         // when
-        boolean result = expenditureService.updateExpenditure(requet, member1, expenditureId);
+        boolean actual = expenditureService.updateExpenditure(requet, member1, expenditureId);
 
         // then: 카테고리는 기존 값과 변경 요청값이 동일하고, 이외의 필드는 수정 요청을 하지 않아 변경한 필드가 없음
         assertAll(
-                () -> assertThat(result).isFalse(),
+                () -> assertThat(actual).isFalse(),
                 () -> assertThat(expenditure.getCategory()).isEqualTo(captured.getCategory()),
                 () -> assertThat(expenditure.getAmount()).isEqualTo(captured.getAmount()),
                 () -> assertThat(expenditure.getMemo()).isEqualTo(captured.getMemo()),

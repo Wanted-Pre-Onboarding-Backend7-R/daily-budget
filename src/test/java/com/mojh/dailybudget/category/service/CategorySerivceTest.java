@@ -40,10 +40,10 @@ class CategorySerivceTest {
                                             .collect(Collectors.toList());
 
         // when
-        List<String> result = categorySerivce.retrieveCategoryList();
+        List<String> actual = categorySerivce.retrieveCategoryList();
 
         // then
-        assertThat(result).containsExactlyInAnyOrderElementsOf(expected);
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 
 }
