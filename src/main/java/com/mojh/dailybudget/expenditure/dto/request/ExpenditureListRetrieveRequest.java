@@ -1,53 +1,37 @@
 package com.mojh.dailybudget.expenditure.dto.request;
 
-import com.mojh.dailybudget.common.dto.request.AmountRangeRequest;
-import com.mojh.dailybudget.common.dto.request.PeriodRequest;
+import com.mojh.dailybudget.expenditure.validation.ValidExpenditureListRetrieveRequest;
 import lombok.Getter;
+import org.hibernate.validator.constraints.Range;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
 
 @Getter
+@ValidExpenditureListRetrieveRequest
 public class ExpenditureListRetrieveRequest {
 
-    @Valid
-    private PeriodRequest period;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime beginDate;
 
-    @Valid
-    private AmountRangeRequest amountRangeRequest;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime endDate;
+
+    @Range(min = 0L, max = 1000000000000L)
+    private Long minAmount;
+
+    @Range(min = 0L, max = 1000000000000L)
+    private Long maxAmount;
 
     private String category;
 
-    public ExpenditureListRetrieveRequest(@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime beginDate,
-                                          @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime endDate,
+    public ExpenditureListRetrieveRequest(LocalDateTime beginDate, LocalDateTime endDate,
                                           Long minAmount, Long maxAmount, String category) {
-        this.period = PeriodRequest.builder()
-                                   .beginDate(beginDate)
-                                   .endDate(endDate)
-                                   .build();
-
-        this.amountRangeRequest = AmountRangeRequest.builder()
-                                                    .minAmount(minAmount)
-                                                    .maxAmount(maxAmount)
-                                                    .build();
+        this.beginDate = beginDate;
+        this.endDate = endDate;
+        this.minAmount = (minAmount != null) ? minAmount : 0L;
+        this.maxAmount = (maxAmount != null) ? maxAmount : 1000000000000L;
         this.category = category;
-    }
-
-    public LocalDateTime getBeginDate() {
-        return period.getBeginDate();
-    }
-
-    public LocalDateTime getEndDate() {
-        return period.getEndDate();
-    }
-
-    public Long getMinAmount() {
-        return amountRangeRequest.getMinAmount();
-    }
-
-    public Long getMaxAmount() {
-        return amountRangeRequest.getMaxAmount();
     }
 
 }

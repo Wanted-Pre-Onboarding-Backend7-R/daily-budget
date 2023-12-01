@@ -1,6 +1,4 @@
-package com.mojh.dailybudget.common.vaildation.annotation;
-
-import com.mojh.dailybudget.common.vaildation.validator.PeriodRequestValidator;
+package com.mojh.dailybudget.expenditure.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -15,17 +13,16 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Retention(RUNTIME)
-@Constraint(validatedBy = PeriodRequestValidator.class)
-@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
-public @interface ValidPeriodRequest {
 
-    String message() default "Invalid Period Value";
+@Retention(RUNTIME)
+@Constraint(validatedBy = ExpenditureListRetrieveRequestValidator.class)
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER, TYPE_USE})
+public @interface ValidExpenditureListRetrieveRequest {
+
+    String message() default "Invalid Query Parameters";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
-    boolean isNullable() default false;
 
 }

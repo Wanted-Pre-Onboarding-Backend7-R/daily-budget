@@ -6,7 +6,6 @@ import com.mojh.dailybudget.category.domain.CategoryType;
 import com.mojh.dailybudget.category.service.CategorySerivce;
 import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
 import com.mojh.dailybudget.common.exception.ErrorCode;
-import com.mojh.dailybudget.common.tmp.TestUilts;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureListRetrieveRequest;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
@@ -25,7 +24,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,10 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.mojh.dailybudget.category.domain.CategoryType.EDUCATION;
 import static com.mojh.dailybudget.category.domain.CategoryType.FOOD;
-import static com.mojh.dailybudget.category.domain.CategoryType.SHOPPING;
-import static com.mojh.dailybudget.category.domain.CategoryType.UNCATEGORIZED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
