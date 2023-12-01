@@ -31,7 +31,7 @@ public final class PatchableFieldUtil {
         }
 
         if (targetObj.getClass() != requestObj.getClass()) {
-            throw new DailyBudgetAppException(ErrorCode.COM_PATCH_FAILED);
+            throw new DailyBudgetAppException(ErrorCode.COMMON_PATCH_FAILED);
         }
 
         // Lambda 안에서 updated 를 접근하기 위한 AtomicReference

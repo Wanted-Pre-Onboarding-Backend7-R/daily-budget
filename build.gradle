@@ -1,10 +1,18 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+		jjwtVersion = "0.11.2"
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.17'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 
-group = 'com.mojh7'
+group = 'com.mojh'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -21,8 +29,6 @@ repositories {
 	mavenCentral()
 }
 
-def JJWT_VERSION = "0.11.2"
-
 dependencies {
 	// spring, web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -31,10 +37,18 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+	// db
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	testImplementation 'com.h2database:h2'
+
+	// query dsl
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
 	// jjwt
-	implementation("io.jsonwebtoken:jjwt-api:$JJWT_VERSION")
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:$JJWT_VERSION")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$JJWT_VERSION")
+	implementation("io.jsonwebtoken:jjwt-api:${jjwtVersion}")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:${jjwtVersion}")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:${jjwtVersion}")
 
 	// lombok
 	compileOnly 'org.projectlombok:lombok'
@@ -45,10 +59,6 @@ dependencies {
 	// log4j2
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
-
-	// db
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	testImplementation 'com.h2database:h2'
 
 	// test - junit5
 	testImplementation ('org.springframework.boot:spring-boot-starter-test') {
@@ -72,3 +82,21 @@ configurations {
 		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
 	}
 }
+
+// query dsl 빌드 옵션
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+sourceSets {
+	main.java.srcDir querydslDir
+}
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+// query dsl 빌드 옵션

@@ -1,6 +1,7 @@
 package com.mojh.dailybudget.expenditure.domain;
 
 import com.mojh.dailybudget.category.domain.Category;
+import com.mojh.dailybudget.category.domain.CategoryType;
 import com.mojh.dailybudget.common.domain.BaseTimeEntity;
 import com.mojh.dailybudget.common.domain.Patchable;
 import com.mojh.dailybudget.common.domain.PatchableFieldUtil;
@@ -65,6 +66,10 @@ public class Expenditure extends BaseTimeEntity {
         this.memo = memo;
         this.excludeFromTotal = excludeFromTotal;
         this.expenditureAt = expenditureAt;
+    }
+
+    public CategoryType getCategoryType() {
+        return this.category.getType();
     }
 
     public boolean isOwner(Member member) {
