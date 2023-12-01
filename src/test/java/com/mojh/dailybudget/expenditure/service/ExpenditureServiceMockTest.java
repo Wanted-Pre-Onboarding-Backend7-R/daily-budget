@@ -6,11 +6,11 @@ import com.mojh.dailybudget.category.domain.CategoryType;
 import com.mojh.dailybudget.category.service.CategorySerivce;
 import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
 import com.mojh.dailybudget.common.exception.ErrorCode;
+import com.mojh.dailybudget.expenditure.ExpenditureFixture;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureListRetrieveRequest;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureListResponse;
-import com.mojh.dailybudget.expenditure.fxiture.ExpenditureFixture;
 import com.mojh.dailybudget.expenditure.repository.ExpenditureRepository;
 import com.mojh.dailybudget.member.MemberFixture;
 import com.mojh.dailybudget.member.domain.Member;
@@ -25,15 +25,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.mojh.dailybudget.category.domain.CategoryType.FOOD;
+import static com.mojh.dailybudget.expenditure.ExpenditureTestUtils.captureExpenditure;
+import static com.mojh.dailybudget.expenditure.ExpenditureTestUtils.expenditureListToExpectedList;
+import static com.mojh.dailybudget.expenditure.ExpenditureTestUtils.filteredExpenditureList;
+import static com.mojh.dailybudget.expenditure.ExpenditureTestUtils.totalExpenditureAmount;
+import static com.mojh.dailybudget.expenditure.ExpenditureTestUtils.totalExpenditureByCategory;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -68,64 +70,6 @@ class ExpenditureServiceMockTest {
         expenditureListFixture = ExpenditureFixture.EXPENDITURE_LIST();
     }
 
-    private Expenditure captureExpenditure(Expenditure expenditure) {
-        return Expenditure.builder()
-                          .category(expenditure.getCategory())
-                          .amount(expenditure.getAmount())
-                          .memo(expenditure.getMemo())
-                          .excludeFromTotal(expenditure.getExcludeFromTotal())
-                          .expenditureAt(expenditure.getExpenditureAt())
-                          .build();
-    }
-
-    private List<Expenditure> filteredExpenditureList(List<Expenditure> expenditureList, Member member,
-                                                      LocalDateTime beginDate, LocalDateTime endDate,
-                                                      Long minAmount, Long maxAmount, String category) {
-        return expenditureList.stream()
-                              .filter(e -> e.getMember().equals(member))
-                              .filter(e -> category == null || e.getCategoryType().toString().equals(category))
-                              .filter(e -> !e.getExpenditureAt().isBefore(beginDate)
-                                      && !e.getExpenditureAt().isAfter(endDate))
-                              .filter(e -> minAmount <= e.getAmount() && e.getAmount() <= maxAmount)
-                              .sorted(Comparator.comparing(Expenditure::getExpenditureAt).reversed())
-                              .collect(Collectors.toList());
-    }
-
-    /**
-     * 카테고리 별 지출 합계 계산
-     * @return
-     */
-    private Map<CategoryType, Long> totalExpenditureByCategory(List<Expenditure> expenditureList) {
-        return expenditureList.stream()
-                              .filter(expenditure -> !expenditure.getExcludeFromTotal())
-                              .collect(Collectors.groupingBy(Expenditure::getCategoryType,
-                                      Collectors.summingLong(Expenditure::getAmount)));
-    }
-
-    /**
-     * 카테고리 별 지출 금액을 합친 총 지출 금액 계산
-     * @param totalExpenditureByCategory
-     * @return
-     */
-    private Long totalExpenditureAmount(Map<CategoryType, Long> totalExpenditureByCategory) {
-        return totalExpenditureByCategory.values().stream()
-                                         .mapToLong(Long::longValue)
-                                         .sum();
-    }
-
-    /**
-     * 지출 목록 데이터 검증을 위해 비교할 필드들만 설정한 지출 목록 예상 tuple list
-     * @param expenditureList
-     * @return
-     */
-    private List<Tuple> expenditureListToExpectedList(List<Expenditure> expenditureList) {
-        return expenditureList.stream()
-                              .map(expenditure -> tuple(
-                                      expenditure.getCategoryType(),
-                                      expenditure.getAmount(),
-                                      expenditure.getExpenditureAt()))
-                              .collect(Collectors.toList());
-    }
 
     @Test
     @DisplayName("조회 조건에 맞는 지출 목록이 없을 때 지출 합계가 0원이고 비어있는 지출 목록이 반환된다.")
