@@ -36,12 +36,14 @@ public final class ExpenditureTestUtils {
     public static List<Expenditure> filteredExpenditureList(List<Expenditure> expenditureList, Member member,
                                                              LocalDateTime beginDate, LocalDateTime endDate,
                                                              Long minAmount, Long maxAmount, String category) {
+        Long capturedMinAmount = (minAmount != null) ? minAmount : 0L;
+        Long capturedMaxAmount = (maxAmount != null) ? maxAmount : 1000000000000L;
         return expenditureList.stream()
                               .filter(e -> e.getMember().equals(member))
                               .filter(e -> category == null || e.getCategoryType().toString().equals(category))
                               .filter(e -> !e.getExpenditureAt().isBefore(beginDate) &&
                                            !e.getExpenditureAt().isAfter(endDate))
-                              .filter(e -> minAmount <= e.getAmount() && e.getAmount() <= maxAmount)
+                              .filter(e -> capturedMinAmount <= e.getAmount() && e.getAmount() <= capturedMaxAmount)
                               .sorted(Comparator.comparing(Expenditure::getExpenditureAt).reversed())
                               .collect(Collectors.toList());
     }
