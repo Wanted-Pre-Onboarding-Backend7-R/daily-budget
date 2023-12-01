@@ -6,6 +6,7 @@ import com.mojh.dailybudget.expenditure.dto.request.ExpenditureCreateRequest;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureListRetrieveRequest;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureListResponse;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
+import com.mojh.dailybudget.expenditure.dto.response.ExpenditureResponse;
 import com.mojh.dailybudget.expenditure.service.ExpenditureService;
 import com.mojh.dailybudget.member.domain.Member;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,13 @@ public class ExpenditureController {
                                                   .toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("{expenditureId}")
+    public ApiResponse<ExpenditureResponse> retrieveExpenditure(@LoginMember final Member member,
+                                                                @PathVariable final Long expenditureId) {
+        ExpenditureResponse response = expenditureService.retrieveExpenditure(member, expenditureId);
+        return ApiResponse.succeed(response);
     }
 
     @GetMapping

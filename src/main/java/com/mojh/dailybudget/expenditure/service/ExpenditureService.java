@@ -8,6 +8,7 @@ import com.mojh.dailybudget.expenditure.domain.Expenditure;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureCreateRequest;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureListRetrieveRequest;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureListResponse;
+import com.mojh.dailybudget.expenditure.dto.response.ExpenditureResponse;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureSummaryResponse;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
 import com.mojh.dailybudget.expenditure.repository.ExpenditureRepository;
@@ -39,8 +40,19 @@ public class ExpenditureService {
         Category category = categoryService.findByCategoryType(request.getCategory());
         Expenditure expenditure = request.toEntity(member, category);
 
-        return expenditureRepository.save(expenditure)
-                                    .getId();
+        return expenditureRepository.save(expenditure).getId();
+    }
+
+    @Transactional(readOnly = true)
+    public ExpenditureResponse retrieveExpenditure(Member member, Long expenditureId) {
+        Expenditure expenditure = expenditureRepository.findById(expenditureId)
+                                                       .orElseThrow(() -> new DailyBudgetAppException(EXPENDITURE_NOT_FOUND));
+
+        if (!expenditure.isOwner(member)) {
+            throw new DailyBudgetAppException(EXPENDITURE_MEMBER_MISMATCH);
+        }
+
+        return ExpenditureResponse.of(expenditure);
     }
 
     @Transactional(readOnly = true)
