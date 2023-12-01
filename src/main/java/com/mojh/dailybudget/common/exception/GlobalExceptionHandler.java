@@ -54,11 +54,15 @@ public class GlobalExceptionHandler {
         ex.getBindingResult()
           .getAllErrors()
           .forEach(error -> {
-              FieldError fieldError = (FieldError) error;
-              if(fieldError.isBindingFailure()) {
-                  errors.put(fieldError.getField(), COM_INVALID_PARAMETERS.getMessage());
+              if (error instanceof FieldError) {
+                  FieldError fieldError = (FieldError) error;
+                  if(fieldError.isBindingFailure()) {
+                      errors.put(fieldError.getField(), COM_INVALID_PARAMETERS.getMessage());
+                  } else {
+                      errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+                  }
               } else {
-                  errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+                  errors.put(error.getObjectName(), error.getDefaultMessage());
               }
           });
         logError(ex);
