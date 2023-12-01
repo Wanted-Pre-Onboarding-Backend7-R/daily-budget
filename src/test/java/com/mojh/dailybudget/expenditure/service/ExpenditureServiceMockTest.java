@@ -11,6 +11,7 @@ import com.mojh.dailybudget.expenditure.domain.Expenditure;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureListRetrieveRequest;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureListResponse;
+import com.mojh.dailybudget.expenditure.dto.response.ExpenditureResponse;
 import com.mojh.dailybudget.expenditure.repository.ExpenditureRepository;
 import com.mojh.dailybudget.member.MemberFixture;
 import com.mojh.dailybudget.member.domain.Member;
@@ -68,6 +69,76 @@ class ExpenditureServiceMockTest {
         member3 = MemberFixture.MEMBER3();
         categoryMap = CategoryFixture.CATEGORY;
         expenditureListFixture = ExpenditureFixture.EXPENDITURE_LIST();
+    }
+
+
+    @Test
+    @DisplayName("지출의 상세 내용을 조회한다.")
+    void retrieveExpenditure() {
+        // given
+        Member member = member1;
+        Expenditure expenditure = expenditureListFixture.get(0);
+        Long expenditureId = expenditure.getId();
+        given(expenditureRepository.findById(expenditureId)).willReturn(Optional.of(expenditure));
+
+        // when
+        ExpenditureResponse actual = expenditureService.retrieveExpenditure(member, expenditureId);
+
+        // then
+        assertAll(
+                () -> verify(expenditureRepository).findById(expenditureId),
+                () -> assertThat(actual.getCategory()).isEqualTo(expenditure.getCategoryType()),
+                () -> assertThat(actual.getAmount()).isEqualTo(expenditure.getAmount()),
+                () -> assertThat(actual.getMemo()).isEqualTo(expenditure.getMemo()),
+                () -> assertThat(actual.getExcludeFromTotal()).isEqualTo(expenditure.getExcludeFromTotal()),
+                () -> assertThat(actual.getExpenditureAt()).isEqualTo(expenditure.getExpenditureAt())
+        );
+    }
+
+    @Test
+    @DisplayName("상세 조회 하려는 지출 정보가 없을 때 EXPENDITURE_NOT_FOUND 예외가 발생한다.")
+    void retrieveExpenditure_throw_expenditureNotFound() {
+        // given
+        Member member = member1;
+        Expenditure expenditure = expenditureListFixture.get(0);
+        Long expenditureId = expenditure.getId();
+        Long otherExpenditureId = expenditureId + 10000L;
+        given(expenditureRepository.findById(otherExpenditureId)).willReturn(Optional.empty());
+
+        // when
+        DailyBudgetAppException ex = assertThrows(DailyBudgetAppException.class, () -> {
+            expenditureService.retrieveExpenditure(member, otherExpenditureId);
+        });
+
+        // then
+        assertAll(
+                () -> assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.EXPENDITURE_NOT_FOUND),
+                () -> verify(expenditureRepository).findById(otherExpenditureId),
+                () -> verify(expenditureRepository, never()).findById(expenditureId)
+        );
+    }
+
+    @Test
+    @DisplayName("다른 사람의 지출 정보를 상세 조회할 때 EXPENDITURE_MEMBER_MISMATCH 예외가 발생한다.")
+    void retrieveExpenditure_throw_expenditureMemberMismatch() {
+        // given: member2가 member1의 지출 정보를 조회하도록 설정
+        Expenditure expenditure = expenditureListFixture.get(0);
+        Long expenditureId = expenditure.getId();
+        Member member = expenditure.getMember();
+        Member otherMember = MemberFixture.MEMBER2();
+        given(expenditureRepository.findById(expenditureId)).willReturn(Optional.of(expenditure));
+
+        // when
+        DailyBudgetAppException ex = assertThrows(DailyBudgetAppException.class, () -> {
+            expenditureService.retrieveExpenditure(otherMember, expenditureId);
+        });
+
+        // then
+        assertAll(
+                () -> assertThat(member).isNotEqualTo(otherMember),
+                () -> assertThat(ex.getErrorCode()).isEqualTo(ErrorCode.EXPENDITURE_MEMBER_MISMATCH),
+                () -> verify(expenditureRepository).findById(expenditureId)
+        );
     }
 
 
