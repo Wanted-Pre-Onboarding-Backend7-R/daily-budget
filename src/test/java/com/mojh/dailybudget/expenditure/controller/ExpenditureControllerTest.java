@@ -1,7 +1,7 @@
 package com.mojh.dailybudget.expenditure.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mojh.dailybudget.auth.fixture.JwtFixture;
+import com.mojh.dailybudget.auth.JwtFixture;
 import com.mojh.dailybudget.common.exception.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -93,13 +93,5 @@ class ExpenditureControllerTest {
                .andExpect(jsonPath("$.error.code").value(expected.getCode()))
                .andExpect(jsonPath("$.error.message").value(expected.getMessage()));
     }
-
-    /*
-    private final boolean success;
-    private final T response;
-    private final ErrorResponse<?> error;
-     */
-
-
 
 }

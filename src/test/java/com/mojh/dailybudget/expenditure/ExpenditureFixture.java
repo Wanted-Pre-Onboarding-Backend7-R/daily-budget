@@ -1,4 +1,4 @@
-package com.mojh.dailybudget.expenditure.fxiture;
+package com.mojh.dailybudget.expenditure;
 
 import com.mojh.dailybudget.category.CategoryFixture;
 import com.mojh.dailybudget.category.domain.Category;

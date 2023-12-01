@@ -1,4 +1,4 @@
-package com.mojh.dailybudget.auth.fixture;
+package com.mojh.dailybudget.auth;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
