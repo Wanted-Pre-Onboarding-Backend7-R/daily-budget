@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static com.mojh.dailybudget.common.exception.ErrorCode.COM_BAD_REQUEST;
-import static com.mojh.dailybudget.common.exception.ErrorCode.COM_INVALID_PARAMETERS;
+import static com.mojh.dailybudget.common.exception.ErrorCode.COMMON_BAD_REQUEST;
+import static com.mojh.dailybudget.common.exception.ErrorCode.COMMON_INVALID_PARAMETERS;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.METHOD_NOT_ALLOWED;
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
           .forEach(error -> errors.put(((FieldError) error).getField(), error.getDefaultMessage()));
         logError(ex);
 
-        return ApiResponse.error(COM_INVALID_PARAMETERS, errors);
+        return ApiResponse.error(COMMON_INVALID_PARAMETERS, errors);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
               if (error instanceof FieldError) {
                   FieldError fieldError = (FieldError) error;
                   if(fieldError.isBindingFailure()) {
-                      errors.put(fieldError.getField(), COM_INVALID_PARAMETERS.getMessage());
+                      errors.put(fieldError.getField(), COMMON_INVALID_PARAMETERS.getMessage());
                   } else {
                       errors.put(fieldError.getField(), fieldError.getDefaultMessage());
                   }
@@ -67,35 +67,35 @@ public class GlobalExceptionHandler {
           });
         logError(ex);
         
-        return ApiResponse.error(COM_INVALID_PARAMETERS, errors);
+        return ApiResponse.error(COMMON_INVALID_PARAMETERS, errors);
     }
     
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(HttpMessageConversionException.class)
     public ApiResponse<?> handleHttpMessageConversionException(HttpMessageConversionException ex) {
         logError(ex);
-        return ApiResponse.error(COM_BAD_REQUEST);
+        return ApiResponse.error(COMMON_BAD_REQUEST);
     }
 
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     public ApiResponse<?> handleIllegalArgumentException(IllegalArgumentException ex) {
         logError(ex);
-        return ApiResponse.error(COM_BAD_REQUEST);
+        return ApiResponse.error(COMMON_BAD_REQUEST);
     }
 
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(IllegalStateException.class)
     public ApiResponse<?> handleIllegalStateException(IllegalStateException ex) {
         logError(ex);
-        return ApiResponse.error(COM_BAD_REQUEST);
+        return ApiResponse.error(COMMON_BAD_REQUEST);
     }
 
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(IllegalAccessException.class)
     public ApiResponse<?> handleIllegalAccessException(IllegalAccessException ex) {
         logError(ex);
-        return ApiResponse.error(COM_BAD_REQUEST);
+        return ApiResponse.error(COMMON_BAD_REQUEST);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -117,8 +117,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ApiResponse<?> handleException(Exception ex) {
-        logError(ex, ErrorCode.COM_INTERNAL_SERVER_ERROR.name());
-        return ApiResponse.error(ErrorCode.COM_INTERNAL_SERVER_ERROR);
+        logError(ex, ErrorCode.COMMON_INTERNAL_SERVER_ERROR.name());
+        return ApiResponse.error(ErrorCode.COMMON_INTERNAL_SERVER_ERROR);
     }
 
     private void logError(Exception ex) {

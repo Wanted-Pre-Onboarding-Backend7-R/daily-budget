@@ -14,10 +14,10 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 public enum ErrorCode {
 
     // common
-    COM_INTERNAL_SERVER_ERROR(INTERNAL_SERVER_ERROR, "COM0000", "시스템 오류입니다."),
-    COM_BAD_REQUEST(BAD_REQUEST, "COM0001", "잘못된 요청입니다."),
-    COM_INVALID_PARAMETERS(BAD_REQUEST, "COM0002", "유효하지 않은 파라미터입니다."),
-    COM_PATCH_FAILED(BAD_REQUEST, "COM0003", "데이터 수정에 실패했습니다."),
+    COMMON_INTERNAL_SERVER_ERROR(INTERNAL_SERVER_ERROR, "COM0000", "시스템 오류입니다."),
+    COMMON_BAD_REQUEST(BAD_REQUEST, "COM0001", "잘못된 요청입니다."),
+    COMMON_INVALID_PARAMETERS(BAD_REQUEST, "COM0002", "유효하지 않은 파라미터입니다."),
+    COMMON_PATCH_FAILED(BAD_REQUEST, "COM0003", "데이터 수정에 실패했습니다."),
 
     // member
     MEMBER_NOT_FOUND(NOT_FOUND, "MEM0001", "유저를 찾을 수 없습니다."),
