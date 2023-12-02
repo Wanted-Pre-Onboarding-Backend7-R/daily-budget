@@ -6,6 +6,7 @@ import com.mojh.dailybudget.common.vaildation.ValidEnum;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
 import com.mojh.dailybudget.member.domain.Member;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
@@ -22,6 +23,7 @@ public class ExpenditureCreateRequest {
     @ValidEnum(enumClass = CategoryType.class)
     private String category;
 
+    @NotNull
     @Range(min = 0L, max = 1000000000000L)
     private Long amount;
 
@@ -34,6 +36,7 @@ public class ExpenditureCreateRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime expenditureAt;
 
+    @Builder
     public ExpenditureCreateRequest(String category, Long amount, String memo,
                                     Boolean excludeFromTotal, LocalDateTime expenditureAt) {
         this.category = category;
