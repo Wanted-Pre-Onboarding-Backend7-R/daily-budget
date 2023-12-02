@@ -1,11 +1,8 @@
 package com.mojh.dailybudget.common.vaildation;
 
-import com.mojh.dailybudget.category.domain.CategoryType;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Arrays;
-import java.util.stream.Stream;
 
 public class EnumValidator implements ConstraintValidator<ValidEnum, String> {
 
