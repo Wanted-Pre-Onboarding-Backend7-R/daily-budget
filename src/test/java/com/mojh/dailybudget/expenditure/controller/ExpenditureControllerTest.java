@@ -75,6 +75,7 @@ class ExpenditureControllerTest {
     DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     private final String URL = "/api/expenditures";
+    private final String GET_URL = URL + "/{expenditureId}";
     private final String DELETE_URL = URL + "/{expenditureId}";
 
     private final String BEGIN_DATE = "beginDate";
@@ -112,6 +113,68 @@ class ExpenditureControllerTest {
         allExpenditureList = expenditureRepository.findAll();
     }
 
+
+    @Test
+    @DisplayName("지출 상세 내용을 조회한다.")
+    void retrieveExpenditure() throws Exception {
+        // given
+        Long expenditrueId = 1L;
+        String accessToken = ACCESS_TOKEN_MEMBER1;
+        Expenditure expected = allExpenditureList.get((int) (expenditrueId - 1));
+        // 같은 시간 값이어도 포맷이 달라 비교할 때 다른 값이라고 판단하기에 string으로 바꿔서 검증
+        String expectedExpenditureAt = expected.getExpenditureAt().format(FORMATTER);
+        
+        // when, then
+        mockMvc.perform(get(GET_URL, expenditrueId).header(AUTHORIZATION, accessToken))
+               .andDo(print())
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.response.category").value(expected.getCategoryType().toString()))
+               .andExpect(jsonPath("$.response.amount").value(expected.getAmount()))
+               .andExpect(jsonPath("$.response.memo").value(expected.getMemo()))
+               .andExpect(jsonPath("$.response.excludeFromTotal").value(expected.getExcludeFromTotal()))
+               .andExpect(jsonPath("$.response.expenditureAt").value(expectedExpenditureAt))
+               .andExpect(jsonPath("$.error").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("지출 상세 내용을 조회할 때 지출이 존재하지 않으면 EXPENDITURE_NOT_FOUND 예외가 발생한다.")
+    void retrieveExpenditure_expenditureNotFound_exception() throws Exception {
+        // given
+        Long expenditrueId = 234234507L;
+        String accessToken = ACCESS_TOKEN_MEMBER1;
+        ErrorCode expected = EXPENDITURE_NOT_FOUND;
+
+        // when, then
+        mockMvc.perform(get(GET_URL, expenditrueId).header(AUTHORIZATION, accessToken))
+               .andDo(print())
+               .andExpect(status().isNotFound())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expected.getCode()))
+               .andExpect(jsonPath("$.error.message").value(expected.getMessage()));
+    }
+
+    @Test
+    @DisplayName("다른 유저의 지출 정보를 조회할 때 EXPENDITURE_MEMBER_MISMATCH 예외가 발생한다.")
+    void retrieveExpenditure_expenditureMemberMismatch_exception() throws Exception {
+        // given: member1이 만든 지출 정보를 member2가 조회하도록 설정
+        Long expenditrueId = 1L;
+        String accessTokenMember2 = JwtFixture.ACCESS_TOKEN_MEMBER2;
+        ErrorCode expected = EXPENDITURE_MEMBER_MISMATCH;
+
+        // when, then
+        mockMvc.perform(get(GET_URL, expenditrueId).header(AUTHORIZATION, accessTokenMember2))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expected.getCode()))
+               .andExpect(jsonPath("$.error.message").value(expected.getMessage()));
+    }
 
     @Test
     @DisplayName("조회 조건에 맞는 지출 목록이 없을 때 지출 합계가 0원이고 비어 있는 지출 목록이 조회된다.")
