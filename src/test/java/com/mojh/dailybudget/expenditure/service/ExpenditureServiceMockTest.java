@@ -97,7 +97,7 @@ class ExpenditureServiceMockTest {
 
     @Test
     @DisplayName("상세 조회 하려는 지출 정보가 없을 때 EXPENDITURE_NOT_FOUND 예외가 발생한다.")
-    void retrieveExpenditure_throw_expenditureNotFound() {
+    void retrieveExpenditure_expenditureNotFound_exception() {
         // given
         Member member = member1;
         Expenditure expenditure = expenditureListFixture.get(0);
@@ -120,7 +120,7 @@ class ExpenditureServiceMockTest {
 
     @Test
     @DisplayName("다른 사람의 지출 정보를 상세 조회할 때 EXPENDITURE_MEMBER_MISMATCH 예외가 발생한다.")
-    void retrieveExpenditure_throw_expenditureMemberMismatch() {
+    void retrieveExpenditure_expenditureMemberMismatch_exception() {
         // given: member2가 member1의 지출 정보를 조회하도록 설정
         Expenditure expenditure = expenditureListFixture.get(0);
         Long expenditureId = expenditure.getId();
@@ -419,7 +419,7 @@ class ExpenditureServiceMockTest {
 
     @Test
     @DisplayName("내가 작성하지 않은 다른 사람의 지출 정보를 수정할 때 EXPENDITURE_MEMBER_MISMATCH 예외가 발생한다.")
-    void updateExpenditure_throw_expenditureMemberMismatch() {
+    void updateExpenditure_expenditureMemberMismatch_exception() {
         // given
         Expenditure expenditure = expenditureListFixture.get(0);
         Long expenditureId = expenditure.getId();
@@ -465,7 +465,7 @@ class ExpenditureServiceMockTest {
 
     @Test
     @DisplayName("삭제하려는 지출 정보가 없을 때 EXPENDITURE_NOT_FOUND 예외가 발생한다.")
-    void deleteExpenditure_throw_expenditureNotFound() {
+    void deleteExpenditure_expenditureNotFound_exception() {
         // given
         Expenditure expenditure = expenditureListFixture.get(0);
         Long expenditureId = expenditure.getId();
@@ -488,7 +488,7 @@ class ExpenditureServiceMockTest {
 
     @Test
     @DisplayName("내가 작성하지 않은 다른 유저의 지출 정보는 삭제할 때 EXPENDITURE_MEMBER_MISMATCH 예외가 발생한다.")
-    void deleteExpenditure_throw_expenditureMemberMismatch() {
+    void deleteExpenditure_expenditureMemberMismatch_exception() {
         // given
         Expenditure expenditure = expenditureListFixture.get(0);
         Long expenditureId = expenditure.getId();

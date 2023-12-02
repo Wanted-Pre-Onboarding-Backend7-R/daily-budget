@@ -554,7 +554,7 @@ class ExpenditureControllerTest {
 
     @Test
     @DisplayName("존재하지 않은 지출 정보를 삭제할 때 EXPENDITURE_NOT_FOUND 예외가 발생한다.")
-    void deleteExpenditure_throw_expenditureNotFound() throws Exception {
+    void deleteExpenditure_expenditureNotFound_exception() throws Exception {
         // given
         Long expenditrueId = 2342345L;
         String accessToken = ACCESS_TOKEN_MEMBER1;
@@ -574,7 +574,7 @@ class ExpenditureControllerTest {
 
     @Test
     @DisplayName("내가 작성하지 않은 다른 유저의 지출 정보를 삭제할 때 EXPENDITURE_MEMBER_MISMATCH 예외가 발생한다.")
-    void deleteExpenditure_throw_expenditureMemberMismatch() throws Exception {
+    void deleteExpenditure_expenditureMemberMismatch_exception() throws Exception {
         // given: member1이 만든 지출 정보를 member2가 삭제하도록 설정
         Long expenditrueId = 1L;
         String accessTokenMember2 = JwtFixture.ACCESS_TOKEN_MEMBER2;
