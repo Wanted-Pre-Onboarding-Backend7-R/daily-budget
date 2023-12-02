@@ -364,7 +364,7 @@ class ExpenditureServiceMockTest {
         Long expenditureId = expenditure.getId();
         Expenditure captured = captureExpenditure(expenditure);
         ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
-                                                                  .category(expenditure.getCategoryType())
+                                                                  .category(expenditure.getCategoryType().toString())
                                                                   .amount(expenditure.getAmount() + 10000L)
                                                                   .memo(expenditure.getMemo() + " 수정")
                                                                   .build();
@@ -396,7 +396,7 @@ class ExpenditureServiceMockTest {
         Long expenditureId = expenditure.getId();
         Expenditure captured = captureExpenditure(expenditure);
         ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
-                                                                  .category(FOOD)
+                                                                  .category(FOOD.toString())
                                                                   .build();
         given(categorySerivce.findByCategoryType(requet.getCategory())).willReturn(expenditure.getCategory());
         given(expenditureRepository.findById(expenditureId)).willReturn(Optional.of(expenditure));
@@ -425,7 +425,7 @@ class ExpenditureServiceMockTest {
         Long expenditureId = expenditure.getId();
         Member otherMember = MemberFixture.MEMBER2();
         ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
-                                                                  .category(FOOD)
+                                                                  .category(FOOD.toString())
                                                                   .amount(30000L)
                                                                   .build();
         given(categorySerivce.findByCategoryType(requet.getCategory())).willReturn(expenditure.getCategory());

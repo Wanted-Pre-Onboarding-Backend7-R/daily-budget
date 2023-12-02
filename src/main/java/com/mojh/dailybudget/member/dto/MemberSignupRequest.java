@@ -22,7 +22,7 @@ public class MemberSignupRequest {
     @Size(min = 8, max = 20)
     private String password;
 
-    @ValidEnum
+    @ValidEnum(enumClass = Role.class)
     private Role role;
 
     @NotBlank

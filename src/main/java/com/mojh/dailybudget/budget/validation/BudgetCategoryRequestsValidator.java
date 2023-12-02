@@ -33,7 +33,7 @@ public class BudgetCategoryRequestsValidator
         Set<CategoryType> checked = new HashSet<>();
 
         for (BudgetCategoryRequest budgetCategoryRequest : value) {
-            CategoryType currentType = budgetCategoryRequest.getCategory();
+            CategoryType currentType = CategoryType.valueOf(budgetCategoryRequest.getCategory());
 
             // 입력된 카테고리별 예산 필드 중복 확인
             if (checked.contains(currentType)) {

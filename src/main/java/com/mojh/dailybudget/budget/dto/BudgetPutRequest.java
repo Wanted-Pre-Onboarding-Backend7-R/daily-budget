@@ -9,9 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,6 +25,7 @@ public class BudgetPutRequest {
     @Range(min = 1, max = 12)
     private Integer month;
 
+    @Valid
     @ValidBudgetCategoryRequests
     private List<BudgetCategoryRequest> budgetCategoryRequests;
 
@@ -34,25 +35,24 @@ public class BudgetPutRequest {
         this.budgetCategoryRequests = budgetCategoryRequests;
     }
 
-    // TODO: static 말고 따로 dto class로 빼도 좋을듯
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class BudgetCategoryRequest {
 
-        @ValidEnum
-        private CategoryType category;
+        @ValidEnum(enumClass = CategoryType.class)
+        private String category;
 
         // TODO: max값 적절한 값으로 설정
         @Range(min = 0L, max = 1000000000000L)
         private long amount;
 
-        public BudgetCategoryRequest(CategoryType category, long amount) {
+        public BudgetCategoryRequest(String category, long amount) {
             this.category = category;
             this.amount = amount;
         }
 
         public BudgetCategory toEntity() {
-            return BudgetCategory.of(category, amount);
+            return BudgetCategory.of(CategoryType.valueOf(category), amount);
         }
 
         // equals, hashcode ide 자동 생성 이용한 코드

@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExpenditureUpdateRequest {
 
-    @ValidEnum
-    private CategoryType category;
+    @ValidEnum(enumClass = CategoryType.class, allowsNull = true)
+    private String category;
 
     @Range(min = 0L, max = 1000000000000L)
     private Long amount;
@@ -33,7 +33,7 @@ public class ExpenditureUpdateRequest {
     private LocalDateTime expenditureAt;
 
     @Builder
-    public ExpenditureUpdateRequest(CategoryType category, Long amount, String memo,
+    public ExpenditureUpdateRequest(String category, Long amount, String memo,
                                     Boolean excludeFromTotal, LocalDateTime expenditureAt) {
         this.category = category;
         this.amount = amount;
