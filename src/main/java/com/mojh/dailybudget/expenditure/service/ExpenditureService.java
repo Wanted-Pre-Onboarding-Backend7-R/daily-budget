@@ -81,7 +81,11 @@ public class ExpenditureService {
 
     @Transactional
     public Boolean updateExpenditure(ExpenditureUpdateRequest request, Member member, Long expenditureId) {
-        Category category = categoryService.findByCategoryType(request.getCategory());
+        Category category = null;
+        if (request.getCategory() != null) {
+            category = categoryService.findByCategoryType(request.getCategory());
+        }
+
         Expenditure expenditure = expenditureRepository.findById(expenditureId)
                                                        .orElseThrow(() -> new DailyBudgetAppException(EXPENDITURE_NOT_FOUND));
         if (!expenditure.isOwner(member)) {
