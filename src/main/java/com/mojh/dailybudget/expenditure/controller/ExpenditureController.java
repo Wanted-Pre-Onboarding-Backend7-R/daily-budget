@@ -38,12 +38,9 @@ public class ExpenditureController {
     @PostMapping
     public ResponseEntity createExpenditure(@RequestBody @Valid final ExpenditureCreateRequest request,
                                             @LoginMember final Member member,
-                                            HttpServletRequest sr) {
+                                            HttpServletRequest httpServletRequest) {
         Long id = expenditureService.createExpenditure(request, member);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri()
-                                                  .path("/{id}")
-                                                  .buildAndExpand(id)
-                                                  .toUri();
+        URI location = URI.create(String.format("%s/%d", httpServletRequest.getRequestURI(), id));
 
         return ResponseEntity.created(location).build();
     }
@@ -57,8 +54,7 @@ public class ExpenditureController {
 
     @GetMapping
     public ApiResponse<ExpenditureListResponse> retrieveExpenditureList(
-            @ModelAttribute @Valid final ExpenditureListRetrieveRequest request, @LoginMember final Member member
-    ) {
+            @ModelAttribute @Valid final ExpenditureListRetrieveRequest request, @LoginMember final Member member) {
         ExpenditureListResponse response = expenditureService.retrieveExpenditureList(request, member);
         return ApiResponse.succeed(response);
     }

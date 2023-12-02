@@ -8,6 +8,7 @@ import com.mojh.dailybudget.common.exception.DailyBudgetAppException;
 import com.mojh.dailybudget.common.exception.ErrorCode;
 import com.mojh.dailybudget.expenditure.ExpenditureFixture;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
+import com.mojh.dailybudget.expenditure.dto.request.ExpenditureCreateRequest;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureListRetrieveRequest;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureListResponse;
@@ -39,6 +40,7 @@ import static com.mojh.dailybudget.expenditure.ExpenditureTestUtils.totalExpendi
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -71,6 +73,28 @@ class ExpenditureServiceMockTest {
         expenditureListFixture = ExpenditureFixture.EXPENDITURE_LIST();
     }
 
+    @Test
+    @DisplayName("지출 정보를 생성한다.")
+    void createExpenditure() {
+        // given
+        Member member = member1;
+        Expenditure expenditure = expenditureListFixture.get(0);
+        ExpenditureCreateRequest requet = new ExpenditureCreateRequest(expenditure.getCategoryType().toString(),
+                expenditure.getAmount(), expenditure.getMemo(), expenditure.getExcludeFromTotal(),
+                expenditure.getExpenditureAt());
+        given(categorySerivce.findByCategoryType(requet.getCategory())).willReturn(expenditure.getCategory());
+        given(expenditureRepository.save(any(Expenditure.class))).willReturn(expenditure);
+
+        // when
+        Long actual = expenditureService.createExpenditure(requet, member);
+
+        // then
+        assertAll(
+                () -> assertThat(actual).isEqualTo(expenditure.getId()),
+                () -> verify(categorySerivce).findByCategoryType(requet.getCategory()),
+                () -> verify(expenditureRepository).save(any(Expenditure.class))
+        );
+    }
 
     @Test
     @DisplayName("지출의 상세 내용을 조회한다.")

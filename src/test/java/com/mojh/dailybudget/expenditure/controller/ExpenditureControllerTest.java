@@ -1,5 +1,6 @@
 package com.mojh.dailybudget.expenditure.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojh.dailybudget.auth.JwtFixture;
@@ -9,6 +10,7 @@ import com.mojh.dailybudget.category.domain.CategoryType;
 import com.mojh.dailybudget.common.exception.ErrorCode;
 import com.mojh.dailybudget.common.web.ApiResponse;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
+import com.mojh.dailybudget.expenditure.dto.request.ExpenditureCreateRequest;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureListResponse;
 import com.mojh.dailybudget.expenditure.repository.ExpenditureRepository;
 import com.mojh.dailybudget.member.MemberFixture;
@@ -35,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.mojh.dailybudget.auth.JwtFixture.ACCESS_TOKEN_MEMBER1;
+import static com.mojh.dailybudget.category.domain.CategoryType.SHOPPING;
 import static com.mojh.dailybudget.common.exception.ErrorCode.EXPENDITURE_MEMBER_MISMATCH;
 import static com.mojh.dailybudget.common.exception.ErrorCode.EXPENDITURE_NOT_FOUND;
 import static com.mojh.dailybudget.expenditure.ExpenditureTestUtils.expenditureListToExpectedList;
@@ -47,10 +50,13 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -113,6 +119,166 @@ class ExpenditureControllerTest {
         allExpenditureList = expenditureRepository.findAll();
     }
 
+    private <T> String toJson(T data) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(data);
+    }
+
+    @Test
+    @DisplayName("지출 정보를 생성한다.")
+    void createExpenditure() throws Exception {
+        // given
+        String accessToken = accessToken1;
+        String category = SHOPPING.toString();
+        Long amount = 49800L;
+        String memo = "옷 구매";
+        boolean excludeFromTotal = false;
+        LocalDateTime expenditureAt = LocalDateTime.of(2023, 11, 15, 13, 42, 16);
+
+        ExpenditureCreateRequest requet = new ExpenditureCreateRequest(category, amount, memo, excludeFromTotal, expenditureAt);
+        String requestBody = toJson(requet);
+
+        Long id = allExpenditureList.size() + 1L;
+        String location = String.format("%s/%d", URL, id);
+
+        // when, then
+        mockMvc.perform(post(URL).header(AUTHORIZATION, accessToken)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isCreated())
+               .andExpect(header().string(LOCATION, location));
+    }
+
+    @Test
+    @DisplayName("지출 정보를 생성할 때 필수 요청 데이터가 누락되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
+    void createExpenditure_requiredFieldsMissing_exception() throws Exception {
+        // given: 요청 데이터 null로 입력되게 설정
+        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        String accessToken = accessToken1;
+
+        ExpenditureCreateRequest request = new ExpenditureCreateRequest(null, null, null, null, null);
+        String requestBody = toJson(request);
+
+        // when, then: category, amount, expenditureAt 필드가 필수이다.
+        mockMvc.perform(post(URL).header(AUTHORIZATION, accessToken)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message.category").exists())
+               .andExpect(jsonPath("$.error.message.amount").exists())
+               .andExpect(jsonPath("$.error.message.expenditureAt").exists());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 생성할 때 카테고리 정보가 유효하지 않으면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
+    void createExpenditure_invalidCategory_exception() throws Exception {
+        // given: null이 아니고 설정된 카테고리와 무관한 데이터로 카테고리 정보 입력
+        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        String accessToken = accessToken1;
+        String category = "invalid" + SHOPPING.toString();
+        Long amount = 49800L;
+        String memo = "옷 구매";
+        boolean excludeFromTotal = false;
+        LocalDateTime expenditureAt = LocalDateTime.of(2023, 11, 15, 13, 42, 16);
+
+        ExpenditureCreateRequest requet = new ExpenditureCreateRequest(category, amount, memo, excludeFromTotal, expenditureAt);
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(post(URL).header(AUTHORIZATION, accessToken)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message.category").exists());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 생성할 때 잘못된 날짜 형식으로 지출 일시를 입력하면 COMMON_BAD_REQUEST 예외가 발생한다.")
+    void createExpenditure_invalidExpenditureAt_exception() throws Exception {
+        // given: 지출 일시를 포맷에 맞지 않는 문자열로 입력
+        ErrorCode expectedErrorCode = ErrorCode.COMMON_BAD_REQUEST;
+        String accessToken = accessToken1;
+        String requestBody = "{\"category\":\"invalidSHOPPING\",\"amount\":49800,\"memo\":\"옷 구매\"," +
+                             "\"excludeFromTotal\":false,\"expenditureAt\":\"invalid2023-11-15T13:42:16time\"}";
+
+        // when, then
+        mockMvc.perform(post(URL).header(AUTHORIZATION, accessToken)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message").value(expectedErrorCode.getMessage()));
+    }
+
+    @Test
+    @DisplayName("지출 정보를 생성할 때 최소 금액 미만의 금액이 입력되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
+    void createExpenditure_LessThanMinAmount_exception() throws Exception {
+        // given: 0원 미만으로 금액 입력하도록 설정
+        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        String accessToken = accessToken1;
+        String category = SHOPPING.toString();
+        Long amount = -1L;
+        String memo = "옷 구매";
+        boolean excludeFromTotal = false;
+        LocalDateTime expenditureAt = LocalDateTime.of(2023, 11, 15, 13, 42, 16);
+
+        ExpenditureCreateRequest requet = new ExpenditureCreateRequest(category, amount, memo, excludeFromTotal, expenditureAt);
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(post(URL).header(AUTHORIZATION, accessToken)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message.amount").exists());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 생성할 때 최대 금액을 초과하는 금액이 입력되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
+    void createExpenditure_ExceedsMaxAmount_exception() throws Exception {
+        // given: 1조원 초과되는 금액이 입력되도록 설정
+        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        String accessToken = accessToken1;
+        String category = SHOPPING.toString();
+        Long amount = 1000000000000L + 1L;
+        String memo = "옷 구매";
+        boolean excludeFromTotal = false;
+        LocalDateTime expenditureAt = LocalDateTime.of(2023, 11, 15, 13, 42, 16);
+
+        ExpenditureCreateRequest requet = new ExpenditureCreateRequest(category, amount, memo, excludeFromTotal, expenditureAt);
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(post(URL).header(AUTHORIZATION, accessToken)
+                                 .contentType(MediaType.APPLICATION_JSON)
+                                 .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message.amount").exists());
+    }
 
     @Test
     @DisplayName("지출 상세 내용을 조회한다.")
