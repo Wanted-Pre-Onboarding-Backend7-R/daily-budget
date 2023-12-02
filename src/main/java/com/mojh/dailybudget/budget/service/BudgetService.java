@@ -51,7 +51,7 @@ public class BudgetService {
             // 카테고리별 예산 list -> map
             Map<CategoryType, BudgetCategoryRequest> budgetCategoryRequests =
                     request.getBudgetCategoryRequests().stream()
-                           .collect(Collectors.toMap(BudgetCategoryRequest::getCategory , Function.identity()));
+                           .collect(Collectors.toMap(req -> CategoryType.valueOf(req.getCategory()) , Function.identity()));
 
             // 카테고리별 예산 update
             for (BudgetCategory budgetCategory : budget.getBudgetCategoryList()) {

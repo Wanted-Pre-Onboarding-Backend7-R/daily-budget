@@ -26,6 +26,12 @@ public class CategorySerivce {
                          .toList();
     }
 
+    public Category findByCategoryType(String categoryType) {
+        CategoryType type = CategoryType.valueOf(categoryType);
+        return categoryRepository.findByType(type)
+                                 .orElseThrow(() -> new DailyBudgetAppException(CATEGORY_NOT_FOUND));
+    }
+
     public Category findByCategoryType(CategoryType categoryType) {
         return categoryRepository.findByType(categoryType)
                                  .orElseThrow(() -> new DailyBudgetAppException(CATEGORY_NOT_FOUND));

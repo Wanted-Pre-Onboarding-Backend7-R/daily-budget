@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExpenditureCreateRequest {
 
-    @ValidEnum
-    private CategoryType category;
+    @ValidEnum(enumClass = CategoryType.class)
+    private String category;
 
     @Range(min = 0L, max = 1000000000000L)
     private Long amount;
@@ -34,7 +34,7 @@ public class ExpenditureCreateRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime expenditureAt;
 
-    public ExpenditureCreateRequest(CategoryType category, Long amount, String memo,
+    public ExpenditureCreateRequest(String category, Long amount, String memo,
                                     Boolean excludeFromTotal, LocalDateTime expenditureAt) {
         this.category = category;
         this.amount = amount;

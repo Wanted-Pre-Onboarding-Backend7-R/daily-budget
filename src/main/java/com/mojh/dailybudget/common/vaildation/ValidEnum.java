@@ -25,4 +25,18 @@ public @interface ValidEnum {
 
     Class<? extends Payload>[] payload() default {};
 
+    Class<? extends java.lang.Enum<?>> enumClass();
+
+    /**
+     * 해당 필드의 null 허용 여부
+     * @return 기본 값은 false
+     */
+    boolean allowsNull() default false;
+
+    /**
+     * 대소문자 구분
+     * @return 기본 값은 false으로 구분하지 않음
+     */
+    boolean caseSensitive() default false;
+
 }
