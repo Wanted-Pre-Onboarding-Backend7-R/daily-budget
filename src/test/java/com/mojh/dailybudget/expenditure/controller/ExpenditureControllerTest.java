@@ -11,6 +11,7 @@ import com.mojh.dailybudget.common.exception.ErrorCode;
 import com.mojh.dailybudget.common.web.ApiResponse;
 import com.mojh.dailybudget.expenditure.domain.Expenditure;
 import com.mojh.dailybudget.expenditure.dto.request.ExpenditureCreateRequest;
+import com.mojh.dailybudget.expenditure.dto.request.ExpenditureUpdateRequest;
 import com.mojh.dailybudget.expenditure.dto.response.ExpenditureListResponse;
 import com.mojh.dailybudget.expenditure.repository.ExpenditureRepository;
 import com.mojh.dailybudget.member.MemberFixture;
@@ -38,6 +39,8 @@ import java.util.Map;
 
 import static com.mojh.dailybudget.auth.JwtFixture.ACCESS_TOKEN_MEMBER1;
 import static com.mojh.dailybudget.category.domain.CategoryType.SHOPPING;
+import static com.mojh.dailybudget.common.exception.ErrorCode.COMMON_BAD_REQUEST;
+import static com.mojh.dailybudget.common.exception.ErrorCode.COMMON_INVALID_PARAMETERS;
 import static com.mojh.dailybudget.common.exception.ErrorCode.EXPENDITURE_MEMBER_MISMATCH;
 import static com.mojh.dailybudget.common.exception.ErrorCode.EXPENDITURE_NOT_FOUND;
 import static com.mojh.dailybudget.expenditure.ExpenditureTestUtils.expenditureListToExpectedList;
@@ -53,6 +56,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.LOCATION;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -82,6 +86,7 @@ class ExpenditureControllerTest {
 
     private final String URL = "/api/expenditures";
     private final String GET_URL = URL + "/{expenditureId}";
+    private final String UPDATE_URL = URL + "/{expenditureId}";
     private final String DELETE_URL = URL + "/{expenditureId}";
 
     private final String BEGIN_DATE = "beginDate";
@@ -153,7 +158,7 @@ class ExpenditureControllerTest {
     @DisplayName("지출 정보를 생성할 때 필수 요청 데이터가 누락되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
     void createExpenditure_requiredFieldsMissing_exception() throws Exception {
         // given: 요청 데이터 null로 입력되게 설정
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
         String accessToken = accessToken1;
 
         ExpenditureCreateRequest request = new ExpenditureCreateRequest(null, null, null, null, null);
@@ -178,7 +183,7 @@ class ExpenditureControllerTest {
     @DisplayName("지출 정보를 생성할 때 카테고리 정보가 유효하지 않으면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
     void createExpenditure_invalidCategory_exception() throws Exception {
         // given: null이 아니고 설정된 카테고리와 무관한 데이터로 카테고리 정보 입력
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
         String accessToken = accessToken1;
         String category = "invalid" + SHOPPING.toString();
         Long amount = 49800L;
@@ -206,7 +211,7 @@ class ExpenditureControllerTest {
     @DisplayName("지출 정보를 생성할 때 잘못된 날짜 형식으로 지출 일시를 입력하면 COMMON_BAD_REQUEST 예외가 발생한다.")
     void createExpenditure_invalidExpenditureAt_exception() throws Exception {
         // given: 지출 일시를 포맷에 맞지 않는 문자열로 입력
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_BAD_REQUEST;
+        ErrorCode expectedErrorCode = COMMON_BAD_REQUEST;
         String accessToken = accessToken1;
         String requestBody = "{\"category\":\"invalidSHOPPING\",\"amount\":49800,\"memo\":\"옷 구매\"," +
                              "\"excludeFromTotal\":false,\"expenditureAt\":\"invalid2023-11-15T13:42:16time\"}";
@@ -226,9 +231,9 @@ class ExpenditureControllerTest {
 
     @Test
     @DisplayName("지출 정보를 생성할 때 최소 금액 미만의 금액이 입력되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
-    void createExpenditure_LessThanMinAmount_exception() throws Exception {
+    void createExpenditure_lessThanMinAmount_exception() throws Exception {
         // given: 0원 미만으로 금액 입력하도록 설정
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
         String accessToken = accessToken1;
         String category = SHOPPING.toString();
         Long amount = -1L;
@@ -254,9 +259,9 @@ class ExpenditureControllerTest {
 
     @Test
     @DisplayName("지출 정보를 생성할 때 최대 금액을 초과하는 금액이 입력되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
-    void createExpenditure_ExceedsMaxAmount_exception() throws Exception {
+    void createExpenditure_exceedsMaxAmount_exception() throws Exception {
         // given: 1조원 초과되는 금액이 입력되도록 설정
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
         String accessToken = accessToken1;
         String category = SHOPPING.toString();
         Long amount = 1000000000000L + 1L;
@@ -592,7 +597,7 @@ class ExpenditureControllerTest {
     void retrieveExpenditureList_requiredQueryParameterMissing_exception() throws Exception {
         // given
         String accessToken = accessToken1;
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
 
         // when, then
         mockMvc.perform(get(URL).header(AUTHORIZATION, accessToken))
@@ -612,7 +617,7 @@ class ExpenditureControllerTest {
         String accessToken = accessToken1;
         String beginDate = "2023-11-01T13:30:00 invalid";
         String endDate = "2023-11-27T15:30:00 test";
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
 
         // when, then
         mockMvc.perform(get(URL).header(AUTHORIZATION, accessToken)
@@ -635,7 +640,7 @@ class ExpenditureControllerTest {
         String accessToken = accessToken1;
         String beginDate = "2023-11-05T13:30:22";
         String endDate = "2023-11-03T15:43:51";
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
 
         // when, then
         mockMvc.perform(get(URL).header(AUTHORIZATION, accessToken)
@@ -659,7 +664,7 @@ class ExpenditureControllerTest {
         String endDate = "2023-11-10T15:43:51";
         String minAmount = "50000";
         String maxAmount = "10000";
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
 
         // when, then
         mockMvc.perform(get(URL).header(AUTHORIZATION, accessToken)
@@ -685,7 +690,7 @@ class ExpenditureControllerTest {
         String endDate = "2023-11-10T15:43:51";
         String minAmount = "-200";
         String maxAmount = "1000000000007";
-        ErrorCode expectedErrorCode = ErrorCode.COMMON_INVALID_PARAMETERS;
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
 
         // when, then
         mockMvc.perform(get(URL).header(AUTHORIZATION, accessToken)
@@ -701,6 +706,268 @@ class ExpenditureControllerTest {
                .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
                .andExpect(jsonPath("$.error.message.minAmount").exists())
                .andExpect(jsonPath("$.error.message.maxAmount").exists());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 수정한다.")
+    void updateExpenditure_patch_true() throws Exception {
+        // given
+        String accessToken = accessToken1;
+        Expenditure expenditure = allExpenditureList.get(0);
+        ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
+                                                                  .category(expenditure.getCategoryType().toString())
+                                                                  .amount(expenditure.getAmount() + 10000L)
+                                                                  .memo(expenditure.getMemo() + " 수정")
+                                                                  .build();
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditure.getId())
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.response").value(true))
+               .andExpect(jsonPath("$.error").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 수정할 때 변경할 필드가 없으면 요청이 실패한 것은 아니나 응답 필드는 false가 반환된다.")
+    void updateExpenditure_patch_false() throws Exception {
+        // given
+        String accessToken = accessToken1;
+        Expenditure expenditure = allExpenditureList.get(0);
+        ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
+                                                                  .amount(expenditure.getAmount())
+                                                                  .memo(expenditure.getMemo())
+                                                                  .build();
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditure.getId())
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.response").value(false))
+               .andExpect(jsonPath("$.error").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 수정할 때 수정 요청 데이터가 모두 null이어도 요청이 실패한 것은 아니나 응답 필드는 false가 반환된다.")
+    void updateExpenditure_allRequestDataIsNull_patchFalse() throws Exception {
+        // given
+        String accessToken = accessToken1;
+        Expenditure expenditure = allExpenditureList.get(0);
+        ExpenditureUpdateRequest requet = new ExpenditureUpdateRequest(null, null, null, null, null);
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditure.getId())
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isOk())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(true))
+               .andExpect(jsonPath("$.response").value(false))
+               .andExpect(jsonPath("$.error").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("존재하지 않은 지출 정보를 수정할 때 EXPENDITURE_NOT_FOUND 예외가 발생한다.")
+    void updateExpenditure_expenditureNotFound_exception() throws Exception {
+        // given
+        ErrorCode expectedErrorCode = EXPENDITURE_NOT_FOUND;
+        String accessToken = accessToken1;
+        Long expenditureId = Long.MAX_VALUE;
+        ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
+                                                                  .amount(10000L)
+                                                                  .memo("메모 수정")
+                                                                  .build();
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditureId)
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isNotFound())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message").value(expectedErrorCode.getMessage()));
+    }
+
+    @Test
+    @DisplayName("지출 정보를 수정할 때 카테고리 정보가 유효하지 않으면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
+    void updateExpenditure_invalidCategory_exception() throws Exception {
+        // given
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
+        String accessToken = accessToken1;
+        Long expenditureId = 1L;
+        ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
+                                                                  .category("invalid category type")
+                                                                  .memo("메모 수정")
+                                                                  .build();
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditureId)
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message.category").exists());
+    }
+
+    @Test
+    @DisplayName("다른 유저의 지출 정보를 수정할 때 EXPENDITURE_MEMBER_MISMATCH 예외가 발생한다.")
+    void updateExpenditure_expenditureMemberMismatch_exception() throws Exception {
+        // given
+        ErrorCode expectedErrorCode = EXPENDITURE_MEMBER_MISMATCH;
+        String otherAccessToken = accessToken2;
+        Long expenditureId = 1L;
+        ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
+                                                                  .amount(10000L)
+                                                                  .memo("메모 수정")
+                                                                  .build();
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditureId)
+                       .header(AUTHORIZATION, otherAccessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message").value(expectedErrorCode.getMessage()));
+    }
+
+    @Test
+    @DisplayName("지출 정보를 수정할 때 최소 금액 미만의 금액이 입력되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
+    void updateExpenditure_lessThanMinAmount_exception() throws Exception {
+        // given: 0원 미만으로 금액 입력하도록 설정
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
+        String accessToken = accessToken1;
+        Long expenditureId = 1L;
+        Long amount = -1L;
+        ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
+                                                                  .amount(amount)
+                                                                  .build();
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditureId)
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message.amount").exists());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 수정할 때 최대 금액을 초과하는 금액이 입력되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
+    void updateExpenditure_exceedsMaxAmount_exception() throws Exception {
+        // given: 1조 원 초과되는 금액이 입력되도록 설정
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
+        String accessToken = accessToken1;
+        Long expenditureId = 1L;
+        Long amount = 1000000000000L + 1L;
+        ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
+                                                                  .amount(amount)
+                                                                  .build();
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditureId)
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message.amount").exists());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 수정할 때 40글자를 초과하는 메모가 입력되면 COMMON_INVALID_PARAMETERS 예외가 발생한다.")
+    void updateExpenditure_exceedsMaxMemoSize_exception() throws Exception {
+        // given
+        ErrorCode expectedErrorCode = COMMON_INVALID_PARAMETERS;
+        String accessToken = accessToken1;
+        Long expenditureId = 1L;
+        StringBuilder sb = new StringBuilder();
+        for(int idx = 1; idx <= 41; idx++) {
+            sb.append('ㄱ');
+        }
+        String memo = sb.toString();
+        ExpenditureUpdateRequest requet = ExpenditureUpdateRequest.builder()
+                                                                  .memo(memo)
+                                                                  .build();
+        String requestBody = toJson(requet);
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditureId)
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message.memo").exists());
+    }
+
+    @Test
+    @DisplayName("지출 정보를 수정할 때 잘못된 날짜 형식으로 지출 일시를 입력하면 COMMON_BAD_REQUEST 예외가 발생한다.")
+    void updateExpenditure_invalidExpenditureAt_exception() throws Exception {
+        // given: 지출 일시를 포맷에 맞지 않는 문자열로 입력
+        ErrorCode expectedErrorCode = COMMON_BAD_REQUEST;
+        String accessToken = accessToken1;
+        Long expenditureId = 1L;
+        String requestBody = "{\"expenditureAt\":\"invalid2023-11-15T13:42:16time\"}";
+
+        // when, then
+        mockMvc.perform(patch(UPDATE_URL, expenditureId)
+                       .header(AUTHORIZATION, accessToken)
+                       .contentType(MediaType.APPLICATION_JSON)
+                       .content(requestBody))
+               .andDo(print())
+               .andExpect(status().isBadRequest())
+               .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.response").doesNotExist())
+               .andExpect(jsonPath("$.error.code").value(expectedErrorCode.getCode()))
+               .andExpect(jsonPath("$.error.message").value(expectedErrorCode.getMessage()));
     }
 
 
